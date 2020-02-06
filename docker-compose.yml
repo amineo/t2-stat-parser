@@ -1,0 +1,46 @@
+version: "3.7"
+
+# Service Definitions
+services:
+
+  db:
+    image: postgres:11.5
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "t2_stats"
+    volumes:
+      - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./build/postgres/export_local_db.sh:/export_local_db.sh    
+      - psqldata:/var/lib/postgresql/data
+    networks:
+      - internal      
+
+
+  app:
+    build:
+      context: .
+      dockerfile: ./build/go/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - internal
+      - external
+
+
+    # secrets:
+    #   - prod.postgres.host
+    #   - prod.postgres.username
+    #   - prod.postgres.password
+
+
+
+volumes:
+  psqldata:
+
+
+networks:
+  external:
+  internal:

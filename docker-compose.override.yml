@@ -1,0 +1,17 @@
+version: "3.7"
+
+# Service Definitions
+services:
+
+  app:
+    command: go run /app/main.go
+    environment: 
+      DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
+    volumes:
+      - ./app/t2-stats:/app
+  
+  db:
+    environment:
+      POSTGRES_USER: "dev"
+      POSTGRES_PASSWORD: "dev"
+      POSTGRES_DB: "t2_stats"
