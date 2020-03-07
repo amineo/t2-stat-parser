@@ -70,6 +70,16 @@ type Game struct {
 }
 
 func initParser() {
+
+	GameTypes := [4]string{"CTFGame", "DMGame", "LakRabbitGame", "SCtFGame"}
+
+	for _, gt := range GameTypes {
+		fmt.Println("Parsing GameType", gt)
+		parseGameTypeStats(gt)
+	}
+}
+
+func parseGameTypeStats(gt string) {
 	start := time.Now()
 	flag.Parse()
 	var err error
@@ -86,7 +96,7 @@ func initParser() {
 	// ----
 
 	var statFiles []string
-	statFolder := "serverStats/CTFGame" // GameType is CTFGame
+	statFolder := "serverStats/stats/" + gt // GameType is ...
 	fileErr := filepath.Walk(statFolder, func(path string, info os.FileInfo, fileErr error) error {
 
 		r, err := regexp.MatchString("g.cs", path)
@@ -105,7 +115,7 @@ func initParser() {
 		g := Game{}
 		// The file name is the player GUID so we need to store that in the object since its not part of the stat line
 		// Add playerGUID, gameType  as part of the stat line
-		g.gameType = strings.Split(file, "/")[1]
+		g.gameType = strings.Split(file, "/")[2]
 		g.playerGUID, err = strconv.Atoi(regexp.MustCompile("[0-9]+").FindAllString(file, -1)[0])
 		if err != nil {
 			fmt.Println("Couldn't convert playerGUID to an int", err)
@@ -151,6 +161,13 @@ func initParser() {
 		if err != nil {
 			fmt.Println("Couldn't convert statOverWrite to an int", err)
 		}
+		if g.statOverWrite < 0 {
+			fmt.Println("Got negative stat Overwrite in file, aborting this stat line")
+			break
+		}
+
+		checkPlayer(g)
+		g.dbStatOverWrite = getDBStatOverWrite(g.playerGUID, strings.ToLower(gt))
 
 		if debugLevel >= 1 {
 			// These dont have a position offset
@@ -160,25 +177,31 @@ func initParser() {
 
 			fmt.Println("Stat Overwrite", g.statOverWrite)
 			fmt.Println("maxStatOverwrite", maxStatOverwrite)
-		}
 
-		checkPlayer(g)
-		g.dbStatOverWrite = getDBStatOverWrite(g.playerGUID)
+			fmt.Println("g.dbStatOverWrite", g.dbStatOverWrite)
+		}
 
 		statCron := 0
 		if g.statOverWrite < g.dbStatOverWrite {
+			//          100 -
 			statCron = (maxStatOverwrite - g.statOverWrite) + g.dbStatOverWrite
 		} else {
 			statCron = g.statOverWrite - g.dbStatOverWrite
 		}
+
+		// Reset statCron if it flows over maxStatOverwrite
+		if statCron > maxStatOverwrite {
+			statCron = 0
+		}
+
 		if debugLevel >= 1 {
 			fmt.Println("statCron", statCron)
 		}
 
-		for i := 1; i <= statCron; i++ {
-			arrPosition := i - 1
-			fmt.Println(arrPosition)
-			parseStatOverWriteLine(g, mStatLine, arrPosition)
+		for i := 0; i <= statCron; i++ {
+			// arrPosition := i - 1
+			// fmt.Println(arrPosition)
+			parseStatOverWriteLine(g, mStatLine, i, strings.ToLower(gt))
 		}
 
 		fmt.Println("---")
@@ -190,7 +213,7 @@ func initParser() {
 	fmt.Println("Total Execution time: ", time.Since(start))
 }
 
-func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition int) {
+func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition int, gt string) {
 
 	if debugLevel == 1 {
 		fmt.Println("Running fn parseStatOverWriteLine")
@@ -219,7 +242,7 @@ func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition i
 	}
 
 	// insert game stat
-	addPlayerGameStat(g)
+	addPlayerGameStat(g, strings.ToLower(gt))
 }
 
 func rowExists(query string, args ...interface{}) bool {
@@ -250,10 +273,10 @@ func createPlayer(uuid string, g Game) {
 	}
 }
 
-func getDBStatOverWrite(playerGUID int) int {
+func getDBStatOverWrite(playerGUID int, gt string) int {
 	var dbStatOverWrite, dbPlayerGUID int
 	// Used to compare ingested statOverWrite to known dbStatOverWrite
-	err := db.QueryRow("select player_guid, stat_overwrite from players where player_guid = $1", playerGUID).Scan(&dbPlayerGUID, &dbStatOverWrite)
+	err := db.QueryRow("select player_guid, stat_overwrite_"+gt+" from players where player_guid = $1", playerGUID).Scan(&dbPlayerGUID, &dbStatOverWrite)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
 		os.Exit(1)
@@ -261,15 +284,15 @@ func getDBStatOverWrite(playerGUID int) int {
 	return dbStatOverWrite
 }
 
-func addPlayerGameStat(g Game) {
+func addPlayerGameStat(g Game, gt string) {
 
 	if debugLevel == 1 {
 		fmt.Println("g.dbStatOverWrite", g.dbStatOverWrite, "g.statOverWrite", g.statOverWrite)
 	}
 
-	if g.dbStatOverWrite != g.statOverWrite {
+	if g.dbStatOverWrite != g.statOverWrite && g.dateStamp != "0" {
 		// Insert new stat line
-		fmt.Println("New stat line!", g.playerName)
+		fmt.Println("New stat line!", g.playerName, g.dateStamp)
 		sqlInsert := `insert into games(player_guid, player_name, stat_overwrite, map, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8)`
 		_, err := db.Exec(sqlInsert, g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.stats, g.dateStamp, g.uuid, g.gameType)
 		if err != nil {
@@ -278,7 +301,7 @@ func addPlayerGameStat(g Game) {
 		}
 
 		// Need to update a players statOverWrite after comparison
-		sqlUpdate := `UPDATE players SET stat_overwrite = $2, total_games = $3 WHERE player_guid = $1;`
+		sqlUpdate := `UPDATE players SET stat_overwrite_` + gt + `= $2, total_games_` + gt + ` = $3 WHERE player_guid = $1;`
 		_, err = db.Exec(sqlUpdate, g.playerGUID, g.statOverWrite, g.totalGames)
 		if err != nil {
 			panic(err)

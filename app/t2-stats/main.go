@@ -12,5 +12,6 @@ Parser for DarkTiger's T2 Server Stats
 package main
 
 func main() {
+
 	initParser()
 }
