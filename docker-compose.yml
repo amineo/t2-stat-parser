@@ -17,10 +17,10 @@ services:
       - internal      
 
 
-  app:
+  parser:
     build:
       context: .
-      dockerfile: ./build/go/Dockerfile
+      dockerfile: ./build/go-t2-stat-parser/Dockerfile
     ports:
       - "8080:8080"
     depends_on:

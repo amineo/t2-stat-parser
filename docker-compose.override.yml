@@ -3,11 +3,11 @@ version: "3.7"
 # Service Definitions
 services:
 
-  app:
+  parser:
     environment: 
       DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
     volumes:
-      - ./app/t2-stats:/app
+      - ./app/t2-stat-parser:/app
   
   db:
     environment:

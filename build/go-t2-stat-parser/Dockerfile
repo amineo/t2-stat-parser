@@ -9,7 +9,7 @@ ENV GO111MODULE=on \
 
 
 WORKDIR /app
-COPY ./app/t2-stats /app
+COPY ./app/t2-stat-parser /app
 
 # Copy and download dependency using go mod
 RUN go mod download
@@ -37,6 +37,6 @@ LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
 WORKDIR /app
 
 COPY --from=builder /app/main /app/main
-COPY ./app/t2-stats/start.sh /app/start.sh
+COPY ./app/t2-stat-parser/start.sh /app/start.sh
 
 ENTRYPOINT ./start.sh
