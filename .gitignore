@@ -1,4 +1,4 @@
 .env
 notes.md
 
-app/t2-stats/serverStats/stats
+app/t2-stat-parser/serverStats/stats
