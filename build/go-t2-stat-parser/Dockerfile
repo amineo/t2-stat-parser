@@ -1,5 +1,5 @@
 # [ Stage 1]  Builder
-FROM golang:alpine AS builder
+FROM golang:1.14-alpine AS builder
 
 # Set necessary environmet variables needed for our image
 ENV GO111MODULE=on \
@@ -30,7 +30,7 @@ RUN go build -o main .
 
 # [ Stage 2]
 
-FROM golang:alpine
+FROM golang:1.14-alpine
 
 LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
 
