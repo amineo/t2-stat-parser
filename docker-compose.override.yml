@@ -4,7 +4,6 @@ version: "3.7"
 services:
 
   app:
-    command: go run /app/main.go
     environment: 
       DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
     volumes:

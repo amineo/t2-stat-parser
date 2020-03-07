@@ -9,7 +9,7 @@ Parser for DarkTiger's T2 Server Stats
 	- Ability to download stat files from remote server via FTP
 */
 
-package parser
+package main
 
 import (
 	"bufio"
@@ -69,7 +69,7 @@ type Game struct {
 	uuid      string `db.games:"uuid"`
 }
 
-func init() {
+func initParser() {
 	start := time.Now()
 	flag.Parse()
 	var err error

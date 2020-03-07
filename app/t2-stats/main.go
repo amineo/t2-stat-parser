@@ -11,10 +11,6 @@ Parser for DarkTiger's T2 Server Stats
 
 package main
 
-import (
-	_ "github.com/amineo/t2-stat-parser"
-)
-
 func main() {
-	init()
+	initParser()
 }
