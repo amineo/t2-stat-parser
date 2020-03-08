@@ -1,17 +1,23 @@
 /*
+	[ T2 Stat Parser for DarkTiger's Stats]
 
-Parser for DarkTiger's T2 Server Stats
+	A player stat parser that retrieves stat files via FTP
+	and imports them into a postgres db daily
 
-[TODO]
-	- Read Additional GameTypes on the fly
-	- Use go modules
-	- Update to v4 SQL driver
-	- Ability to download stat files from remote server via FTP
 */
 
 package main
 
-func main() {
+import (
+	"fmt"
+)
 
+func main() {
+	fmt.Println("Starting FTP stat file download")
+	initFTP()
+	fmt.Println("Stat files downloaded!")
+
+	fmt.Println("Starting stat parser")
 	initParser()
+	fmt.Println("All done!")
 }
