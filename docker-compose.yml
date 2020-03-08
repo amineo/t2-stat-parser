@@ -4,7 +4,10 @@ version: "3.7"
 services:
 
   db:
-    image: postgres:11.5
+    image: "amineo/t2-stats-db:v0.1.1"
+    build:
+      context: .
+      dockerfile: ./build/postgres/Dockerfile
     ports:
       - "5432:5432"
     environment:
@@ -12,14 +15,13 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
-      - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./build/postgres/export_local_db.sh:/export_local_db.sh    
       - psqldata:/var/lib/postgresql/data
     networks:
       - internal      
 
 
   parser:
+    image: "amineo/t2-stats-parser:v0.1.1"
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile

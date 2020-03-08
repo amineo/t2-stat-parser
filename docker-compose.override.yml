@@ -5,9 +5,12 @@ services:
 
   db:
     environment:
+      POSTGRES_DB: "t2_stats"
       POSTGRES_USER: "dev"
       POSTGRES_PASSWORD: "dev"
-      POSTGRES_DB: "t2_stats"
+    volumes: 
+      - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./build/postgres/export_local_db.sh:/export_local_db.sh    
 
 
   parser:
