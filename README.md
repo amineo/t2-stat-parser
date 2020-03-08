@@ -2,12 +2,15 @@
 **This is very much still a work in progress.**
 The motivation behind this is to get more familiar with Go.
 If you notice that there are better ways to do things, I'm all ears. :)
+Like all things, everything could be improved.
+
 
 
 ## Run
-- `docker-compose up` Runs the whole stack in unison
-- `docker-compose up app` Just run the app, useful if you're making changes to the `main.go` file
-- `docker-compose up db` Just run the db
+    - `docker-compose up` Runs the whole stack in unison
+    - `docker-compose up parser` Just run the app, useful if you're makin code changes
+    - `docker-compose up db` Just run the db
+
 
 
 ## Notes
@@ -19,13 +22,15 @@ If you notice that there are better ways to do things, I'm all ears. :)
     - Parses generated stat files into json and insert them into a database (postgres)
     - Keeps records in sync to prevent duped entries
     - Creates/Updates player records to game records
+    - Supports multiple game types
+    - Scheduled FTP stat file retreval from a remote T2 game server
 
 
 
 ## Features in que
-    - Read Additional GameTypes on the fly
-    - Use go modules 
     - Update to v4 SQL driver
-    - Ability to download stat files from remote server via FTP
+    - Documentation 
+
+
 
 (Feel free to open an issue if you have any suggestions/feature requests) 
