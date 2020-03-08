@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo "starting..";
-
 echo "Checking if build exists.."
 if [ -f /app/main ]
 then
@@ -11,5 +9,3 @@ else
     echo "No build found, running from source"
     go run *.go
 fi
-
-

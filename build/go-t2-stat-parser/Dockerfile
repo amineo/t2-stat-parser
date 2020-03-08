@@ -13,31 +13,29 @@ COPY ./app/t2-stat-parser /app
 
 # Copy and download dependency using go mod
 RUN go mod download
-
-
-# # Go Packages
-# RUN go get -u -v \
-#     # GUID Generator
-#     github.com/rs/xid \
-#     # PostgreSQL Driver
-#     github.com/jackc/pgx \
-#     github.com/jmoiron/sqlx \
-#     # Better Error Handling
-#     github.com/pkg/errors
-
 RUN go build -o main .
 
+
+# ------------------------------------------
+# ------------------------------------------
 
 # [ Stage 2]
 
 FROM golang:1.14-alpine
-RUN apk update && apk add --no-cache wget
-
 LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
+
+RUN apk update && apk add --no-cache wget tzdata
+
+#Set TimeZone
+ENV TZ=America/New_York
+
+#Set cron schedule  (every day at 8am est)
+RUN crontab -l -u root | echo "0 8 * * * sh -c \"/app/start.sh\"" | crontab -u root -
 
 WORKDIR /app
 
 COPY --from=builder /app/main /app/main
 COPY ./app/t2-stat-parser/start.sh /app/start.sh
+COPY ./app/t2-stat-parser/parser-daemon.sh /app/parser-daemon.sh
 
-ENTRYPOINT ./start.sh
+ENTRYPOINT ./parser-daemon.sh
