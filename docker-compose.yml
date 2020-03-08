@@ -8,8 +8,6 @@ services:
     build:
       context: .
       dockerfile: ./build/postgres/Dockerfile
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: "t2_stats"
       POSTGRES_USER: "${POSTGRES_USER}"
@@ -17,7 +15,14 @@ services:
     volumes:
       - psqldata:/var/lib/postgresql/data
     networks:
-      - internal      
+      - internal
+    deploy:
+      labels:
+        - traefik.enable=false
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]      
 
 
   parser:
@@ -25,8 +30,6 @@ services:
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
-    ports:
-      - "8080:8080"
     environment: 
       DATABASE_URL: "postgres://${POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/t2_stats"
       FTP_HOST: "${FTP_HOST}"
@@ -37,6 +40,11 @@ services:
     networks:
       - internal
       - external
+    deploy:
+      labels:
+        - traefik.enable=false
+      mode: replicated
+      replicas: 1
 
 
 volumes:

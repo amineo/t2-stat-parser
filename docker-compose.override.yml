@@ -8,13 +8,17 @@ services:
       POSTGRES_DB: "t2_stats"
       POSTGRES_USER: "dev"
       POSTGRES_PASSWORD: "dev"
+    ports:
+      - "5432:5432"      
     volumes: 
       - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./build/postgres/export_local_db.sh:/export_local_db.sh    
+      - ./build/postgres/export_local_db.sh:/export_local_db.sh 
 
 
   parser:
     environment: 
       DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
+    ports:
+      - "8080:8080"      
     volumes:
       - ./app/t2-stat-parser:/app
