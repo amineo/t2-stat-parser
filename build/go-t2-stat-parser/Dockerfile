@@ -31,6 +31,7 @@ RUN go build -o main .
 # [ Stage 2]
 
 FROM golang:1.14-alpine
+RUN apk update && apk add --no-cache wget
 
 LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
 
