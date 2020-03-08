@@ -4,7 +4,7 @@ version: "3.7"
 services:
 
   db:
-    image: "amineo/t2-stats-db:v0.1.1"
+    image: "amineo/t2-stats-db:v0.1.2"
     build:
       context: .
       dockerfile: ./build/postgres/Dockerfile
@@ -26,7 +26,7 @@ services:
 
 
   parser:
-    image: "amineo/t2-stats-parser:v0.1.1"
+    image: "amineo/t2-stats-parser:v0.1.2"
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
