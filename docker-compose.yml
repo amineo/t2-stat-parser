@@ -9,6 +9,8 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: "t2_stats"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ./build/postgres/export_local_db.sh:/export_local_db.sh    
@@ -23,18 +25,16 @@ services:
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
     ports:
       - "8080:8080"
+    environment: 
+      DATABASE_URL: "postgres://${POSTGRES_USER}:{POSTGRES_PASSWORD}@db:5432/t2_stats"
+      FTP_HOST: "${FTP_HOST}"
+      FTP_USER: "${FTP_USER}"
+      FTP_PW: "${FTP_PW}"      
     depends_on:
       - db
     networks:
       - internal
       - external
-
-
-    # secrets:
-    #   - prod.postgres.host
-    #   - prod.postgres.username
-    #   - prod.postgres.password
-
 
 
 volumes:
