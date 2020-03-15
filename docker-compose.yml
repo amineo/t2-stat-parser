@@ -4,7 +4,7 @@ version: "3.7"
 services:
 
   db:
-    image: "amineo/t2-stats-db:v0.1.2"
+    image: "amineo/t2-stats-db:v0.1.3"
     build:
       context: .
       dockerfile: ./build/postgres/Dockerfile
@@ -26,7 +26,7 @@ services:
 
 
   parser:
-    image: "amineo/t2-stats-parser:v0.1.2"
+    image: "amineo/t2-stats-parser:v0.1.3"
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
@@ -45,6 +45,21 @@ services:
         - traefik.enable=false
       mode: replicated
       replicas: 1
+
+
+  # api:
+  #   image: "node:12-alpine"
+  #   depends_on: 
+  #     - db
+  #   networks: 
+  #     - internal
+  #     - external
+  #   deploy:
+  #     labels:
+  #       - traefik.enable=true
+  #     mode: replicated
+  #     replicas: 1
+
 
 
 volumes:
