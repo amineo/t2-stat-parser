@@ -7,5 +7,6 @@ then
     /app/main
 else
     echo "No build found, running from source"
+    cd /app
     go run *.go
 fi
