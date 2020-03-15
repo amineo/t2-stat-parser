@@ -60,6 +60,7 @@ type Game struct {
 	statOverWrite   int
 
 	gameMap   string `db.games:"map"`
+	gameID    int    `db.games:"game_id"`
 	gameType  string `db.games:"gametype"`
 	dateStamp string `db.games:"datestamp"`
 	stats     string `db.games:"stats"`
@@ -233,6 +234,17 @@ func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition i
 	g.uuid = genXid()
 	g.gameMap = cleanStatLine["map"][0]
 
+	if value, ok := mStatLine["gameID"]; ok {
+		fmt.Println("gameID", value[arrPosition])
+		g.gameID, err = strconv.Atoi(value[arrPosition])
+		if err != nil {
+			fmt.Println("Couldn't convert gameID to an int", err)
+		}
+	} else {
+		fmt.Println("No gameID found!")
+		g.gameID = 0
+	}
+
 	if debugLevel >= 2 {
 		// log the game struct
 		fmt.Println(g)
@@ -290,8 +302,8 @@ func addPlayerGameStat(g Game, gt string) {
 	if g.dbStatOverWrite != g.statOverWrite && g.dateStamp != "0" {
 		// Insert new stat line
 		fmt.Println("New stat line!", g.playerName, g.dateStamp)
-		sqlInsert := `insert into games(player_guid, player_name, stat_overwrite, map, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8)`
-		_, err := db.Exec(sqlInsert, g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.stats, g.dateStamp, g.uuid, g.gameType)
+		sqlInsert := `insert into games(player_guid, player_name, stat_overwrite, map, game_id, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8,$9)`
+		_, err := db.Exec(sqlInsert, g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.gameID, g.stats, g.dateStamp, g.uuid, g.gameType)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unable to add player's game stat: %v\n", err)
 			os.Exit(1)
