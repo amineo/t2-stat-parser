@@ -41,6 +41,7 @@ CREATE TABLE "public"."games" (
     "player_name" text NOT NULL,
     "stat_overwrite" numeric NOT NULL,
     "map" text NOT NULL,
+    "game_id" numeric NOT NULL DEFAULT 0,
     "stats" jsonb NOT NULL,
     "datestamp" timestamp NOT NULL,
     "uuid" text NOT NULL UNIQUE,
