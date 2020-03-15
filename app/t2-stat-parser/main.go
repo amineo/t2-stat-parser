@@ -10,6 +10,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -19,5 +20,5 @@ func main() {
 
 	fmt.Println("Starting stat parser")
 	initParser()
-	fmt.Println("All done!")
+	fmt.Println("All done!", time.Now().Format(time.RFC850))
 }
