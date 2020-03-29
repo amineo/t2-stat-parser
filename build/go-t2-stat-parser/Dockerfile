@@ -29,8 +29,8 @@ RUN apk update && apk add --no-cache wget tzdata
 #Set TimeZone
 ENV TZ=America/New_York
 
-#Set cron schedule  (every day at 9:30am est)
-RUN echo '30 9 * * * /app/start.sh' > /etc/crontabs/root
+#Set cron schedule  (every day at 11:30am est)
+RUN echo '30 11 * * * /app/start.sh' > /etc/crontabs/root
 
 WORKDIR /app
 

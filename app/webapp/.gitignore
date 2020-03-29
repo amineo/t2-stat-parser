@@ -1,0 +1,12 @@
+# Adonis directory for storing tmp files
+tmp
+
+# Don't store build
+build
+
+# Environment variables, never commit this file
+.env
+
+public/hot
+public/mix-manifest.json
+public/dist

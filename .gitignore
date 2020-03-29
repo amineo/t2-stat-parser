@@ -1,5 +1,9 @@
 .env
+node_modules
+
 notes.md
 
 app/t2-stat-parser/serverStats/stats
+
 docker-compose.deploy.yml
+docker-secrets/adonis.appkey.*
