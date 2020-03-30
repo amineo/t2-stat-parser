@@ -24,8 +24,20 @@ class PlayerController {
 
   // Player Detail
   async player({ inertia, request }) {
-    const playerInfo = await Database.from('players').where({ player_guid: request.params.player_guid })
-    const playerStatData = await Database.from('games').where({ player_guid: request.params.player_guid })
+    const playerInfo = await Database.from('players')
+                            .distinct('player_guid',
+                                      'player_name',
+                                      'total_games_ctfgame',
+                                      'total_games_dmgame',
+                                      'total_games_lakrabbitgame',
+                                      'total_games_sctfgame')
+                            .where({ player_guid: request.params.player_guid })
+
+
+    const playerStatData = await Database.from('games')
+                                .select('game_id',
+                                        'stats')
+                                .where({ player_guid: request.params.player_guid })
 
     let playerData = {
       player: playerInfo[0],
