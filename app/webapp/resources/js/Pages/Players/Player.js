@@ -17,8 +17,7 @@ export default function Player(props) {
       />
 
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <div>{JSON.stringify(props.playerData.player)}</div>
-       <div> {JSON.stringify(props.playerData.stats)}</div>
+       <div className="py-10 px-10"><code> {JSON.stringify(props.playerData.stats)}</code></div>
       </div>
     </Layout>
   )

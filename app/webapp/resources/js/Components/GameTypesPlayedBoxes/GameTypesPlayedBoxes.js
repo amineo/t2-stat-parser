@@ -1,6 +1,6 @@
 import React from 'react'
 
-const returnTotalGames = (player) => {
+const returnTotalSumGames = (player) => {
   let sum = Number(player.ctf) +
             Number(player.dm) +
             Number(player.lak) +
@@ -12,7 +12,7 @@ const GameTypesPlayedBoxes = (props) => {
   return (
     <div>
       <h3 className="text-md leading-6 font-medium text-gray-900">
-        Games Played {returnTotalGames(props)}
+        Games Played {returnTotalSumGames(props)}
       </h3>
       <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-4">
         <div className="bg-white overflow-hidden shadow rounded-lg">
