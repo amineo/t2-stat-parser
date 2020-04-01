@@ -39,9 +39,35 @@ class PlayerController {
                                         'stats')
                                 .where({ player_guid: request.params.player_guid })
 
+
+    let playerStatTotals = {},
+        statKeys = Object.keys(playerStatData[0].stats)
+
+    for(let i = 0 ; i < statKeys.length; i++) {
+      if(statKeys[i] === "map" ||
+         statKeys[i] === "dateStamp" ||
+         statKeys[i] === "timeDayMonth" ){continue;}
+      playerStatTotals[statKeys[i]] = 0;
+   }
+
+
+   playerStatData.map(statLine => {
+    for (let [key, value] of Object.entries(statLine.stats)) {
+      //  console.log(`${key}: ${value}`);
+      if(playerStatTotals.hasOwnProperty(key) === true){
+        playerStatTotals[key] = playerStatTotals[key] + Number(value);
+      }else{
+        playerStatTotals[key] = Number(value);
+      }
+    }
+  })
+
+   console.log(playerStatTotals);
+
     let playerData = {
       player: playerInfo[0],
-      stats: playerStatData
+      stats: playerStatData,
+      totals: playerStatTotals
     }
 
     const pageTitle = playerData.player.player_name
