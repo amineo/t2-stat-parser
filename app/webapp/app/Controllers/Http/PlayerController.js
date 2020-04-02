@@ -40,29 +40,31 @@ class PlayerController {
                                 .where({ player_guid: request.params.player_guid })
 
 
-    let playerStatTotals = {},
-        statKeys = Object.keys(playerStatData[0].stats)
+      // Dynamically generate and sum the stats object
+      let playerStatTotals = {},
+          statKeys = Object.keys(playerStatData[0].stats)
 
-    for(let i = 0 ; i < statKeys.length; i++) {
-      if(statKeys[i] === "map" ||
-         statKeys[i] === "dateStamp" ||
-         statKeys[i] === "timeDayMonth" ){continue;}
-      playerStatTotals[statKeys[i]] = 0;
-   }
-
-
-   playerStatData.map(statLine => {
-    for (let [key, value] of Object.entries(statLine.stats)) {
-      //  console.log(`${key}: ${value}`);
-      if(playerStatTotals.hasOwnProperty(key) === true){
-        playerStatTotals[key] = playerStatTotals[key] + Number(value);
-      }else{
-        playerStatTotals[key] = Number(value);
-      }
+      for(let i = 0 ; i < statKeys.length; i++) {
+        if(statKeys[i] === "map" ||
+          statKeys[i] === "dateStamp" ||
+          statKeys[i] === "timeDayMonth" ){continue;}
+        playerStatTotals[statKeys[i]] = 0;
     }
-  })
 
-   console.log(playerStatTotals);
+    // Loop through the playerStatsData query from the DB
+    playerStatData.map(statLine => {
+      // look through each object in playerStatsData array
+      for (let [key, value] of Object.entries(statLine.stats)) {
+        //  console.log(`${key}: ${value}`);
+        // If the stat item exists, add it -- if not create a new key in playerStatTotals
+        if(playerStatTotals.hasOwnProperty(key) === true){
+          playerStatTotals[key] = playerStatTotals[key] + Number(value);
+        }else{
+          playerStatTotals[key] = Number(value);
+        }
+      }
+    })
+
 
     let playerData = {
       player: playerInfo[0],
