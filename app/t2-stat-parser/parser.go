@@ -32,8 +32,8 @@ import (
 var (
 	connectionString = flag.String("conn", getenvWithDefault("DATABASE_URL", ""), "PostgreSQL connection string")
 	db               *sqlx.DB
-	maxStatOverwrite int = 100
-	debugLevel       int = 1 // 0 off,min | 1 Basic output checks | 2 Output all the things
+	maxStatOverwrite int = 98 // there are 99 entries, remember arr counts 0
+	debugLevel       int = 1  // 0 off,min | 1 Basic output checks | 2 Output all the things
 )
 
 func getenvWithDefault(name, defaultValue string) string {
@@ -164,6 +164,9 @@ func parseGameTypeStats(gt string) {
 			break
 		}
 
+		// Base the maxGamesLength off how many elements are present in the map length since this should always be there
+		statArrayMaxLength := len(mStatLine["map"])
+
 		checkPlayer(g)
 		g.dbStatOverWrite = getDBStatOverWrite(g.playerGUID, strings.ToLower(gt))
 
@@ -176,31 +179,38 @@ func parseGameTypeStats(gt string) {
 			fmt.Println("Stat Overwrite", g.statOverWrite)
 			fmt.Println("maxStatOverwrite", maxStatOverwrite)
 
+			fmt.Println("statArrayMaxLength", statArrayMaxLength)
+
 			fmt.Println("g.dbStatOverWrite", g.dbStatOverWrite)
 		}
 
-		statCron := 0
-		if g.statOverWrite < g.dbStatOverWrite {
-			//          100 -
-			statCron = (maxStatOverwrite - g.statOverWrite) + g.dbStatOverWrite
-		} else {
-			statCron = g.statOverWrite - g.dbStatOverWrite
-		}
+		// statEntryDiff := 0
+		// if g.statOverWrite < g.dbStatOverWrite {
+		// 	//          100 -
+		// 	statEntryDiff = (maxStatOverwrite - g.statOverWrite) + g.dbStatOverWrite
+		// } else {
+		// 	statEntryDiff = g.statOverWrite - g.dbStatOverWrite
+		// }
 
-		// Reset statCron if it flows over maxStatOverwrite
-		if statCron > maxStatOverwrite {
-			statCron = 0
-		}
+		// // Reset statEntryDiff if it flows over maxStatOverwrite
+		// if statEntryDiff > maxStatOverwrite {
+		// 	statEntryDiff = 0
+		// }
 
-		if debugLevel >= 1 {
-			fmt.Println("statCron", statCron)
-		}
+		// if debugLevel >= 1 {
+		// 	fmt.Println("statEntryDiff", statEntryDiff)
+		// }
 
-		for i := 0; i <= statCron; i++ {
-			// arrPosition := i - 1
-			// fmt.Println(arrPosition)
+		for i := 0; i < statArrayMaxLength; i++ {
+			fmt.Println("index", i)
 			parseStatOverWriteLine(g, mStatLine, i, strings.ToLower(gt))
+			//g.dbStatOverWrite = getDBStatOverWrite(g.playerGUID, strings.ToLower(gt))
 		}
+
+		// account for new players and new statlines
+		// if g.statOverWrite == 0 && g.dbStatOverWrite == 0 {
+		// 	parseStatOverWriteLine(g, mStatLine, 0, strings.ToLower(gt))
+		// }
 
 		fmt.Println("---")
 	}
@@ -220,8 +230,13 @@ func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition i
 
 	cleanStatLine := make(map[string][]string)
 	for index, element := range mStatLine {
-		if len(element) > 1 {
+		//fmt.Println("index", index, "  -  arrPosition", arrPosition, "  -  element Length", len(element))
+		if len(element) > 1 && arrPosition < len(element) {
+			//fmt.Println("index", index, "  -  arrPosition", arrPosition, "  -  element Length", len(element))
 			cleanStatLine[index] = append(cleanStatLine[index], element[arrPosition])
+		} else {
+			//fmt.Println(index, "prefilling this index since there isnt any data in this position...")
+			cleanStatLine[index] = append(cleanStatLine[index], "0")
 		}
 	}
 
@@ -250,8 +265,12 @@ func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition i
 		fmt.Println(g)
 	}
 
-	// insert game stat
-	addPlayerGameStat(g, strings.ToLower(gt))
+	if checkGameEntry(g) == false && g.gameID != 0 {
+		fmt.Println("does not exist, add")
+		// insert game stat
+		addPlayerGameStat(g, strings.ToLower(gt))
+	}
+
 }
 
 func rowExists(query string, args ...interface{}) bool {
@@ -270,6 +289,16 @@ func checkPlayer(g Game) {
 		createPlayer(genXid(), g)
 	} else {
 		fmt.Println("Player already exists", g.playerName)
+	}
+}
+
+func checkGameEntry(g Game) bool {
+	check := rowExists("select player_guid from games where player_guid = $1 and game_id = $2 and map = $3", g.playerGUID, g.gameID, g.gameMap)
+	if !check {
+		return false
+	} else {
+		fmt.Println("Game Entry ", g.gameID, g.gameMap, " already exists for ", g.playerName)
+		return true
 	}
 }
 
@@ -293,13 +322,23 @@ func getDBStatOverWrite(playerGUID int, gt string) int {
 	return dbStatOverWrite
 }
 
+func resetDBStatOverWrite(playerGUID int, gt string) {
+	sqlUpdate := `UPDATE players SET stat_overwrite_` + gt + `= 1 WHERE player_guid = $1;`
+	_, err := db.Exec(sqlUpdate, playerGUID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Reset player", playerGUID, "for GameType", gt)
+}
+
 func addPlayerGameStat(g Game, gt string) {
 
 	if debugLevel == 1 {
 		fmt.Println("g.dbStatOverWrite", g.dbStatOverWrite, "g.statOverWrite", g.statOverWrite)
+		fmt.Println("Checking line: ", g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.gameID, g.dateStamp, g.gameType)
 	}
 
-	if g.dbStatOverWrite != g.statOverWrite && g.dateStamp != "0" {
+	if g.dateStamp != "0" {
 		// Insert new stat line
 		fmt.Println("New stat line!", g.playerName, g.dateStamp)
 		sqlInsert := `insert into games(player_guid, player_name, stat_overwrite, map, game_id, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8,$9)`
@@ -316,6 +355,9 @@ func addPlayerGameStat(g Game, gt string) {
 			panic(err)
 		}
 	} else {
-		fmt.Println("This stat line already exists")
+		fmt.Println("The dateStamp looks malformed")
 	}
+	// else {
+	// 	fmt.Println("This stat line already exists", g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.gameID, g.dateStamp, g.gameType)
+	// }
 }
