@@ -6,6 +6,9 @@ import Layout from '@/Shared/Layout'
 
 const GameRow = (game, index) => {
 
+  // TODO: move this into controller for faster render
+  if (Number(game.stats.score) === 0){return}
+
   return <li key={index}>
     <InertiaLink href={`/game/${game.game_id}`} className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
       <div className="flex items-center px-4 py-4 sm:px-6">

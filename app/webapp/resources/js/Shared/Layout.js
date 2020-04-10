@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import TopNav from '../Components/TopNav';
 import FrameHeading from '../Components/FrameHeading'
 
-export default function Layout({ title, children }) {
+export default function Layout({ title, gametype, children }) {
   useEffect(() => {
     document.title = title;
   }, [title])
@@ -11,7 +11,7 @@ export default function Layout({ title, children }) {
   return (
   <>
     <TopNav />
-    <FrameHeading heading={title} />
+    <FrameHeading heading={title} gametype={gametype} />
     <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-4 sm:px-0">
         { children }

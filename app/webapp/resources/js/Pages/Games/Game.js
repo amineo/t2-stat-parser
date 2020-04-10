@@ -41,7 +41,7 @@ const renderActiveShape = (props) => {
       />
       <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${value} points`}</text>
+      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${value}`}</text>
       <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
         {`(${(percent * 100).toFixed(2)}%)`}
       </text>
@@ -63,7 +63,6 @@ export class TwoLevelPieChart extends PureComponent {
   };
 
   render() {
-    console.log(this.state.data);
     return (
       <PieChart width={400} height={400}>
         <Pie
@@ -77,6 +76,7 @@ export class TwoLevelPieChart extends PureComponent {
           fill="#ccc"
           dataKey="value"
           onMouseEnter={this.onPieEnter}
+          className="text-xs"
         />
       </PieChart>
     );
@@ -85,64 +85,86 @@ export class TwoLevelPieChart extends PureComponent {
 
 
 const PlayerRow = (player, index) => {
+  // dont show scoreless players
+  if (Number(player.stats.score) <= 0){return}
 
-  return <li key={index}>
-    <InertiaLink href={`/player/${player.player_guid}`} className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
-      <div className="flex items-center px-4 py-4 sm:px-6">
-        <div className="min-w-0 flex-1 flex items-center">
-          <div className="min-w-0 flex-1 md:grid md:grid-cols-2 md:gap-4">
-            <div>
-              <div className="text-sm leading-5 font-medium text-indigo-600 truncate">{player.player_name}</div>
-              <div className="mt-2 flex items-center text-sm leading-5 text-gray-500">
-                <span className="truncate">Last Active:</span>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div>
-                <div className="text-sm leading-5 text-gray-900">
-                  Total Score
-                </div>
-                <div className="mt-2 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium leading-4 bg-gray-100 text-gray-800">{player.stats.score}</span>
-
-                  {
-                    (player.gametype == "CTFGame" || player.gametype == "SCtFGame") ? <TwoLevelPieChart data={{
-                        oScore: Number(player.stats.offenseScore[0]),
-                        dScore: Number(player.stats.defenseScore[0])}
-                      }/>
-                    : ''
-                  }
-                </div>
-
-              </div>
-            </div>
-          </div>
+  return  <div className="flex flex-col rounded-lg shadow-lg overflow-hidden" key={index}>
+  <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
+      <h3 className="text-lg leading-6 font-medium">
+      <InertiaLink href={`/player/${player.player_guid}`} className="text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out">{player.player_name}</InertiaLink>
+      </h3>
+    </div>
+    <div>
+      <dl>
+        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt className="text-sm leading-5 font-medium text-gray-500">
+            Total Score
+          </dt>
+          <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {player.stats.score}
+          </dd>
         </div>
-        <div>
-          <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
-          </svg>
+        <div className="bg-gray-50">
+          {
+            (player.gametype == "CTFGame" || player.gametype == "SCtFGame") ? <TwoLevelPieChart data={{
+                oScore: Number(player.stats.offenseScore[0]),
+                dScore: Number(player.stats.defenseScore[0])}
+              }/>
+            : ''
+          }
         </div>
-      </div>
-    </InertiaLink>
-    </li>;
+        <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt className="text-sm leading-5 font-medium text-gray-500">
+            Kills / Assists
+          </dt>
+          <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {player.stats.kills} / {player.stats.assist}
+          </dd>
+        </div>
+        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt className="text-sm leading-5 font-medium text-gray-500">
+            MAs
+          </dt>
+          <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {player.stats.totalMA}
+          </dd>
+        </div>
+        <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt className="text-sm leading-5 font-medium text-gray-500">
+          Flag Grabs / Caps
+          </dt>
+          <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {player.stats.flagGrabs} / {player.stats.flagCaps}
+          </dd>
+        </div>
+        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt className="text-sm leading-5 font-medium text-gray-500">
+          Flag Defends / Carrier Kills / Returns
+          </dt>
+          <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+          {player.stats.flagDefends} / {player.stats.carrierKills} / {player.stats.flagReturns}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>;
 }
 
 
 
 export default function Game(props) {
   return (
-    <Layout title={props.pageTitle}>
+    <Layout title={props.pageTitle.name} gametype={props.pageTitle.gametype}>
 
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul>
-          { props.gameInfo.map((game, index) => PlayerRow(game, index)) }
-        </ul>
+      <div className="mt-2 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none">
+        { props.gameInfo.map((game, index) => PlayerRow(game, index)) }
       </div>
-
+{/*
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
        <div className="py-10 px-10"><code> {JSON.stringify(props.gameInfo)}</code></div>
-      </div>
+      </div> */}
     </Layout>
   )
 }

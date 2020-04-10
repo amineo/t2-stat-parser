@@ -6,12 +6,13 @@ class GameController {
 
   // /games
   async index({ inertia }) {
-    const pageTitle = "Last 1000 Games"
+    const pageTitle = "Last 1000 Games";
+
     const gamesQry = await Database.table('games')
       .distinct('game_id',
                 'map',
                 'gametype',
-      //          'stats',
+                'stats',
                 'datestamp')
       .where('game_id', '<>', 0)
       .orderBy('game_id', 'desc')
@@ -27,13 +28,14 @@ class GameController {
       }
     }, []);
 
+    // move the 0 score display logic here
+
     return inertia.render('Games/Main', { pageTitle, games }, { edgeVar: 'server-variable' })
   }
 
 
   // game/:game_id
   async game({ inertia, request }) {
-
     const gameInfo = await Database.from('games')
                                      .distinct('game_id',
                                      'map',
@@ -43,9 +45,11 @@ class GameController {
                                      'stats',
                                      'datestamp')
                                      .where({ game_id: request.params.game_id })
+    const pageTitle = {
+      name: gameInfo[0]['map'],
+      gametype: gameInfo[0]['gametype']
+    }
 
-
-    const pageTitle = gameInfo[0]['map']
     return inertia.render('Games/Game', { pageTitle, gameInfo }, { edgeVar: 'server-variable' })
   }
 

@@ -7,6 +7,7 @@ const FrameHeading = (props) => {
       <h1 className="text-lg leading-6 font-semibold text-gray-900">
         {props.heading}
       </h1>
+      { props.gametype ? props.gametype : ''}
     </div>
   </header>
   );
