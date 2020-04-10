@@ -43,7 +43,7 @@ export default function Player(props) {
                             spawnctf={props.playerData.player.total_games_sctfgame}
       />
 
-      <RadarChart cx={300} cy={250} outerRadius={150} width={600} height={500} data={returnWeaponTotals(props.playerData.totals)} className="text-sm">
+      <RadarChart cx={300} cy={250} outerRadius={150} width={600} height={500} data={ returnWeaponTotals(props.playerData.totals).length ? returnWeaponTotals(props.playerData.totals) : [{ weapon: 'No Data', val:1}]} className="text-sm">
         <PolarGrid />
         <PolarAngleAxis dataKey="weapon" />
         <PolarRadiusAxis/>
