@@ -25,7 +25,7 @@ Route.get('/player/:player_guid',  'PlayerController.player')
 
 // [ game ]
 Route.get('/games', 'GameController.index')
-//Route.get('/game/:game_id', 'GameController.game')
+Route.get('/game/:game_id', 'GameController.game')
 
 
 

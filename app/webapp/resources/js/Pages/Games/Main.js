@@ -7,23 +7,23 @@ import Layout from '@/Shared/Layout'
 const GameRow = (game, index) => {
 
   return <li key={index}>
-    <InertiaLink href={`/games/${game.game_id}`} className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+    <InertiaLink href={`/game/${game.game_id}`} className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
       <div className="flex items-center px-4 py-4 sm:px-6">
         <div className="min-w-0 flex-1 flex items-center">
           <div className="min-w-0 flex-1 md:grid md:grid-cols-2 md:gap-4">
             <div>
               <div className="text-sm leading-5 font-medium text-indigo-600 truncate">{game.map}</div>
               <div className="mt-2 flex items-center text-sm leading-5 text-gray-500">
-                <span className="truncate">Last Active: {game.datestamp.split(/[T]/)[0]}</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium leading-4 bg-gray-100 text-gray-800">Played: {game.datestamp.split(/[T]/)[0]}</span>
               </div>
             </div>
             <div className="hidden md:block">
               <div>
                 <div className="text-sm leading-5 text-gray-900">
-                  Total Games Played
+
                 </div>
                 <div className="mt-2 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium leading-4 bg-gray-100 text-gray-800"> </span>
+                  <span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium leading-5 bg-indigo-100 text-indigo-800">{game.gametype}</span>
                 </div>
               </div>
             </div>

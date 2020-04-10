@@ -4,26 +4,52 @@ const Database = use('Database')
 
 class GameController {
 
+  // /games
   async index({ inertia }) {
-
     const pageTitle = "Last 1000 Games"
     const gamesQry = await Database.table('games')
       .distinct('game_id',
                 'map',
-                'stats',
+                'gametype',
+      //          'stats',
                 'datestamp')
       .where('game_id', '<>', 0)
       .orderBy('game_id', 'desc')
       .limit(1000)
 
-
-    // prep to combine objects for each game
-    let games = gamesQry
-
-
+    // filter out duplicate game_ids (https://dev.to/marinamosti/removing-duplicates-in-an-array-of-objects-in-js-with-sets-3fep)
+    const games = gamesQry.reduce((game, current) => {
+      const x = game.find(item => item.game_id === current.game_id);
+      if (!x) {
+        return game.concat([current]);
+      } else {
+        return game;
+      }
+    }, []);
 
     return inertia.render('Games/Main', { pageTitle, games }, { edgeVar: 'server-variable' })
   }
+
+
+  // game/:game_id
+  async game({ inertia, request }) {
+
+    const gameInfo = await Database.from('games')
+                                     .distinct('game_id',
+                                     'map',
+                                     'player_name',
+                                     'player_guid',
+                                     'gametype',
+                                     'stats',
+                                     'datestamp')
+                                     .where({ game_id: request.params.game_id })
+
+
+    const pageTitle = gameInfo[0]['map']
+    return inertia.render('Games/Game', { pageTitle, gameInfo }, { edgeVar: 'server-variable' })
+  }
+
+
 
 }
 
