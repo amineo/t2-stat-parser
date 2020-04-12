@@ -5,7 +5,7 @@ import FrameHeading from '../Components/FrameHeading'
 
 export default function Layout({ title, gametype, children }) {
   useEffect(() => {
-    document.title = title;
+    document.title = title + ' - Tribes 2 Stats';
   }, [title])
 
   return (

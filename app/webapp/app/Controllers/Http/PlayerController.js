@@ -36,6 +36,7 @@ class PlayerController {
 
     const playerStatData = await Database.from('games')
                                 .select('game_id',
+                                        'gametype',
                                         'stats')
                                 .where({ player_guid: request.params.player_guid })
 

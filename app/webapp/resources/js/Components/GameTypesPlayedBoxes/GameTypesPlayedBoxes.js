@@ -10,7 +10,7 @@ const returnTotalSumGames = (player) => {
 
 const GameTypesPlayedBoxes = (props) => {
   return (
-    <div>
+    <>
       <h3 className="text-md leading-6 font-medium text-gray-900">
         Games Played {returnTotalSumGames(props)}
       </h3>
@@ -64,7 +64,7 @@ const GameTypesPlayedBoxes = (props) => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

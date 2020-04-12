@@ -17,7 +17,9 @@
 const Route = use('Route')
 
 // [ Routes ]
-Route.get('/', 'IndexController.index').as('home')
+//Route.get('/', 'IndexController.index').as('home')
+//temp set games as home
+Route.get('/', 'GameController.index').as('home')
 
 // [ player ]
 Route.get('/players', 'PlayerController.index')

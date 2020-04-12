@@ -105,7 +105,7 @@ const PlayerRow = (player, index) => {
           {player.stats.score}
           </dd>
         </div>
-        <div className="bg-gray-50">
+        <div className="bg-gray-50 flex items-center justify-center">
           {
             (player.gametype == "CTFGame" || player.gametype == "SCtFGame") ? <TwoLevelPieChart data={{
                 oScore: Number(player.stats.offenseScore[0]),
