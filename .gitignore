@@ -6,4 +6,5 @@ notes.md
 app/t2-stat-parser/serverStats/stats
 
 docker-compose.deploy.yml
+traefik.yml
 docker-secrets/adonis.appkey.*
