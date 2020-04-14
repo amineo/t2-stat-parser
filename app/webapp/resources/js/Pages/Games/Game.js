@@ -86,7 +86,7 @@ export class TwoLevelPieChart extends PureComponent {
 
 const PlayerRow = (player, index) => {
   // dont show scoreless players
-  if (Number(player.stats.score) <= 0){return}
+  //if (Number(player.stats.score) <= 0){return}
 
   return  <div className="flex flex-col rounded-lg shadow-lg overflow-hidden" key={index}>
   <div className="bg-white shadow overflow-hidden sm:rounded-lg">

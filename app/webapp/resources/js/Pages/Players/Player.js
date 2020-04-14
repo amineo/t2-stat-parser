@@ -156,7 +156,7 @@ export default function Player(props) {
           { props.playerData.stats.map((player, index) => GameCard(player, index)) }
         </div>
       </div>
-{/* 
+{/*
 
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
        <div className="py-10 px-10"><code> {JSON.stringify(props.playerData.stats)}</code></div>

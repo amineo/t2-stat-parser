@@ -17,7 +17,7 @@ class PlayerController {
                 'updated_at')
       .groupBy('player_guid')
       .orderBy('player_name', 'asc')
-      .limit(2500)
+      .limit(1000)
 
     return inertia.render('Players/Main', { pageTitle, players }, { edgeVar: 'server-variable' })
   }
@@ -32,6 +32,7 @@ class PlayerController {
                                       'total_games_lakrabbitgame',
                                       'total_games_sctfgame')
                             .where({ player_guid: request.params.player_guid })
+                            .limit(50)
 
 
     const playerStatData = await Database.from('games')
@@ -39,6 +40,7 @@ class PlayerController {
                                         'gametype',
                                         'stats')
                                 .where({ player_guid: request.params.player_guid })
+                                .limit(50)
 
 
       // Dynamically generate and sum the stats object

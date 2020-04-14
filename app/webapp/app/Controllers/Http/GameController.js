@@ -6,20 +6,21 @@ class GameController {
 
   // /games
   async index({ inertia }) {
-    const pageTitle = "Last 1000 Games";
 
-    const gamesQry = await Database.table('games')
-      .distinct('game_id',
-                'map',
-                'gametype',
-                'stats',
-                'datestamp')
-      .where('game_id', '<>', 0)
-      .orderBy('game_id', 'desc')
-      .limit(1000)
+    const pageTitle = `Latest Games`;
 
-    // filter out duplicate game_ids (https://dev.to/marinamosti/removing-duplicates-in-an-array-of-objects-in-js-with-sets-3fep)
-    const games = gamesQry.reduce((game, current) => {
+    const gamesQry = await Database.raw(`
+      SELECT distinct game_id,map,gametype, datestamp
+      FROM games
+      WHERE (stats->>'score' IS NOT NULL) AND (game_id <> 0)
+      ORDER BY game_id desc
+      LIMIT 2000;
+      `);
+
+
+      // filter out duplicate game_ids (https://dev.to/marinamosti/removing-duplicates-in-an-array-of-objects-in-js-with-sets-3fep)
+      const games = gamesQry.rows.reduce((game, current) => {
+
       const x = game.find(item => item.game_id === current.game_id);
       if (!x) {
         return game.concat([current]);
