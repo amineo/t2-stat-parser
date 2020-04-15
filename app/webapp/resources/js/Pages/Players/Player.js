@@ -31,7 +31,7 @@ const returnWeaponTotals = (statTotals) => {
 
 const GameCard = (player, index) => {
   // only display card if player has score
-  if (Number(player.stats.score) <= 0){return}
+ // if (Number(player.stats.score) <= 0){return}
 
    return <div key={index}  className="bg-white shadow overflow-hidden sm:rounded-lg mb-5">
 
