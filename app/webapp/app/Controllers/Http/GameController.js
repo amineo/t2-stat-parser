@@ -9,14 +9,24 @@ class GameController {
 
     const pageTitle = `Latest Games`;
 
-    const gamesQry = await Database.raw(`
-      SELECT distinct game_id,map,gametype, datestamp
-      FROM games
-      WHERE (stats->>'score' IS NOT NULL) AND (game_id <> 0)
-      ORDER BY game_id desc
-      LIMIT 2000;
-      `);
+    // const gamesQry = await Database.raw(`
+    //   SELECT distinct game_id,map,gametype, datestamp
+    //   FROM games
+    //   WHERE (stats->>'score' IS NOT NULL) AND (game_id <> 0)
+    //   ORDER BY game_id desc
+    //   LIMIT 2000;
+    //   `);
 
+
+    const gamesQry = await Database.raw(`
+      WITH gamelist AS (
+        SELECT DISTINCT p.game_id, p.map, p.gametype, p.datestamp, count(*) OVER (PARTITION BY game_id) as count from games p
+      )
+      SELECT * from gamelist
+        WHERE (count > 1) AND (game_id <> 0)
+        ORDER BY game_id desc
+        LIMIT 2000
+      `);
 
       // filter out duplicate game_ids (https://dev.to/marinamosti/removing-duplicates-in-an-array-of-objects-in-js-with-sets-3fep)
       const games = gamesQry.rows.reduce((game, current) => {

@@ -40,6 +40,7 @@ class PlayerController {
                                         'gametype',
                                         'stats')
                                 .where({ player_guid: request.params.player_guid })
+                                .orderBy('game_id', 'desc')
                                 .limit(50)
 
 
