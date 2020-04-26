@@ -14,6 +14,7 @@ const providers = [
   '@adonisjs/framework/providers/AppProvider',
   '@adonisjs/framework/providers/ViewProvider',
   '@adonisjs/lucid/providers/LucidProvider',
+  '@adonisjs/cors/providers/CorsProvider',
   'inertia-adonis/providers/InertiaProvider'
 ]
 
