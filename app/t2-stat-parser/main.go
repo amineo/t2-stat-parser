@@ -14,9 +14,9 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting FTP stat file download")
+	// fmt.Println("Starting FTP stat file download")
 	initFTP()
-	fmt.Println("Stat files downloaded!")
+	// fmt.Println("Stat files downloaded!")
 
 	fmt.Println("Starting stat parser")
 	initParser()

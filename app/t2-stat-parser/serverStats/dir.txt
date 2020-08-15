@@ -1,0 +1,7 @@
+./lData
+./mlData
+
+./stats/CTFGame
+./stats/DMGame
+./stats/LakRabbitGame
+./stats/SCTF/Game

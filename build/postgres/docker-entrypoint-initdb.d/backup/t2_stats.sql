@@ -31,25 +31,52 @@ CREATE TABLE "public"."players" (
 );
 
 
+
+
 DROP TABLE IF EXISTS "public"."games";
-CREATE SEQUENCE IF NOT EXISTS games_id_seq;
 
 -- Table Definition
 CREATE TABLE "public"."games" (
+    "game_id" numeric NOT NULL UNIQUE,
+    "map" text NOT NULL,
+    "datestamp" timestamp NOT NULL,
+    "gametype" text NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT game_pk PRIMARY KEY (game_id)
+);
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS "public"."game_detail";
+CREATE SEQUENCE IF NOT EXISTS games_id_seq;
+
+-- Table Definition
+CREATE TABLE "public"."game_detail" (
     "id" int4 NOT NULL DEFAULT nextval('games_id_seq'::regclass),
     "player_guid" numeric NOT NULL,
     "player_name" text NOT NULL,
     "stat_overwrite" numeric NOT NULL,
     "map" text NOT NULL,
-    "game_id" numeric NOT NULL DEFAULT 0,
+    "game_id" numeric NOT NULL,
     "stats" jsonb NOT NULL,
     "datestamp" timestamp NOT NULL,
     "uuid" text NOT NULL UNIQUE,
     "gametype" text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT games_pk PRIMARY KEY (id),
+    FOREIGN KEY (game_id) REFERENCES games (game_id),
     FOREIGN KEY (player_guid) REFERENCES players (player_guid)
 );
+
+
+
+
+
 
 
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()

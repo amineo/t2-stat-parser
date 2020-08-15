@@ -59,12 +59,12 @@ type Game struct {
 	dbStatOverWrite int `db.players:"stat_overwrite"`
 	statOverWrite   int
 
-	gameMap   string `db.games:"map"`
-	gameID    int    `db.games:"game_id"`
-	gameType  string `db.games:"gametype"`
-	dateStamp string `db.games:"datestamp"`
-	stats     string `db.games:"stats"`
-	uuid      string `db.games:"uuid"`
+	gameMap   string `db.game_detail:"map"`
+	gameID    int    `db.game_detail:"game_id"`
+	gameType  string `db.game_detail:"gametype"`
+	dateStamp string `db.game_detail:"datestamp"`
+	stats     string `db.game_detail:"stats"`
+	uuid      string `db.game_detail:"uuid"`
 }
 
 func initParser() {
@@ -265,7 +265,10 @@ func parseStatOverWriteLine(g Game, mStatLine map[string][]string, arrPosition i
 		fmt.Println(g)
 	}
 
-	if checkGameEntry(g) == false && g.gameID != 0 {
+	// Check if we need to create a new game record
+	checkGameRecord(g)
+
+	if checkGameEntryForPlayer(g) == false && g.gameID != 0 {
 		fmt.Println("does not exist, add")
 		// insert game stat
 		addPlayerGameStat(g, strings.ToLower(gt))
@@ -283,6 +286,28 @@ func rowExists(query string, args ...interface{}) bool {
 	return exists
 }
 
+func checkGameRecord(g Game) {
+	check := rowExists("select game_id from games where game_id = $1 and map = $2", g.gameID, g.gameMap)
+	if !check {
+		createGame(g)
+	} else {
+		fmt.Println("Game Record ", g.gameID, g.gameMap, " already exists")
+	}
+}
+func createGame(g Game) {
+	fmt.Println("Creating new Game ", g.gameMap, g.gameID, g.dateStamp, g.gameType)
+
+	if g.gameID != 0 {
+		sqlInsert := `insert into games(map, game_id, datestamp, gametype) values($1,$2,$3,$4)`
+		_, err := db.Exec(sqlInsert, g.gameMap, g.gameID, g.dateStamp, g.gameType)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to create new game record (Possible Dupe ID): %v\n", err)
+			// Don't exit - just skip this insert
+			//	os.Exit(1)
+		}
+	}
+}
+
 func checkPlayer(g Game) {
 	check := rowExists("select player_guid from players where player_guid = $1", g.playerGUID)
 	if !check {
@@ -292,8 +317,8 @@ func checkPlayer(g Game) {
 	}
 }
 
-func checkGameEntry(g Game) bool {
-	check := rowExists("select player_guid from games where player_guid = $1 and game_id = $2 and map = $3", g.playerGUID, g.gameID, g.gameMap)
+func checkGameEntryForPlayer(g Game) bool {
+	check := rowExists("select player_guid from game_detail where player_guid = $1 and game_id = $2 and map = $3", g.playerGUID, g.gameID, g.gameMap)
 	if !check {
 		return false
 	} else {
@@ -341,7 +366,7 @@ func addPlayerGameStat(g Game, gt string) {
 	if g.dateStamp != "0" {
 		// Insert new stat line
 		fmt.Println("New stat line!", g.playerName, g.dateStamp)
-		sqlInsert := `insert into games(player_guid, player_name, stat_overwrite, map, game_id, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8,$9)`
+		sqlInsert := `insert into game_detail(player_guid, player_name, stat_overwrite, map, game_id, stats, datestamp, uuid, gametype) values($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 		_, err := db.Exec(sqlInsert, g.playerGUID, g.playerName, g.statOverWrite, g.gameMap, g.gameID, g.stats, g.dateStamp, g.uuid, g.gameType)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unable to add player's game stat: %v\n", err)
