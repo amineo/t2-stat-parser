@@ -6,6 +6,7 @@ notes.md
 app/t2-stat-parser/serverStats/stats
 app/t2-stat-parser/serverStats/mlData
 app/t2-stat-parser/serverStats/lData
+app/t2-stat-parser/serverStats/__notes
 
 docker-compose.deploy.yml
 traefik.yml
