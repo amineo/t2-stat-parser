@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Connection, Repository } from 'typeorm';
 
@@ -18,9 +18,28 @@ export class GamesService {
 		const { limit, offset } = paginationQuery;
 		const games = await this.gamesRepository.find({
 			skip: offset,
-			take: limit
+			take: limit,
+			order: {
+				gameId: 'DESC'
+			}
 		});
 
 		return games;
+	}
+
+	async findByType(gametype: string) {
+		const game = await this.gamesRepository.find({ where: { gametype: gametype } });
+		if (!game) {
+			throw new NotFoundException(`Game Type: ${gametype} not found`);
+		}
+		return game;
+	}
+
+	async findOne(gameId: string) {
+		const game = await this.gamesRepository.findOne(gameId);
+		if (!game) {
+			throw new NotFoundException(`Game ID: ${gameId} not found`);
+		}
+		return game;
 	}
 }
