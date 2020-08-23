@@ -1,0 +1,16 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { GameController } from './game.controller';
+import { GameService } from './game.service';
+
+import { GameDetail } from './entities/GameDetail';
+import { Games } from '../games/entities/Games';
+
+@Module({
+	imports: [ TypeOrmModule.forFeature([ Games, GameDetail ]), ConfigModule ],
+	controllers: [ GameController ],
+	providers: [ GameService ]
+})
+export class GameModule {}

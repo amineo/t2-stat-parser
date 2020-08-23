@@ -1,5 +1,5 @@
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { GameDetail } from '../games/entities/GameDetail';
+import { GameDetail } from '../game/entities/GameDetail';
 
 @Index('players_pk', [ 'playerGuid' ], { unique: true })
 @Index('players_player_name_key', [ 'playerName' ], { unique: true })
@@ -57,6 +57,6 @@ export class Players {
 	})
 	updatedAt: Date;
 
-	@OneToMany(() => GameDetail, (gameDetail) => gameDetail.playerGuid)
-	gameDetails: GameDetail[];
+	// @OneToMany(() => GameDetail, (gameDetail) => gameDetail.playerGuid)
+	// gameDetails: GameDetail[];
 }

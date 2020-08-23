@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GamesModule } from './games/games.module';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -25,7 +26,8 @@ import { GamesModule } from './games/games.module';
 			database: process.env.DATABASE_NAME,
 			autoLoadEntities: true // models will be loaded automatically (you don't have to explicitly specify the entities: [] array)
 		}),
-		GamesModule
+		GamesModule,
+		GameModule
 	],
 	controllers: [ AppController ],
 	providers: [ AppService ]

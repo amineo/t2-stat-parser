@@ -20,7 +20,7 @@ export class GamesController {
 		return this.gameService.findByType(gametype);
 	}
 
-	// /game/:gameId
+	// /games/:gameId
 	@Get(':gameId')
 	findOne(@Param('gameId') gameId: string) {
 		return this.gameService.findOne(gameId);

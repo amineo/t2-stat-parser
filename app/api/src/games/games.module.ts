@@ -6,9 +6,10 @@ import { GamesController } from './games.controller';
 import { GamesService } from './games.service';
 
 import { Games } from './entities/Games';
+import { GameDetail } from '../game/entities/GameDetail';
 
 @Module({
-	imports: [ TypeOrmModule.forFeature([ Games ]), ConfigModule ],
+	imports: [ TypeOrmModule.forFeature([ Games, GameDetail ]), ConfigModule ],
 	controllers: [ GamesController ],
 	providers: [ GamesService ]
 })

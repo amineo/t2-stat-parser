@@ -1,5 +1,5 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
-import { GameDetail } from './GameDetail';
+import { GameDetail } from '../../game/entities/GameDetail';
 
 @Index('game_pk', [ 'gameId' ], { unique: true })
 @Entity('games', { schema: 'public' })
@@ -21,4 +21,11 @@ export class Games {
 		default: () => 'now()'
 	})
 	createdAt: Date;
+
+	@OneToMany(() => GameDetail, (gameDetail) => Games.gameDetail)
+	gameDetails: GameDetail[];
+
+	@ManyToOne(() => Games, (games) => games.gameDetail)
+	@JoinColumn([ { name: 'game_id', referencedColumnName: 'gameId' } ])
+	game: Games;
 }
