@@ -28,7 +28,14 @@ export class GamesService {
 	}
 
 	async findByType(gametype: string) {
-		const game = await this.gamesRepository.find({ where: { gametype: gametype } });
+		const game = await this.gamesRepository.find({
+			where: { gametype: gametype },
+			skip: 0,
+			take: 10,
+			order: {
+				gameId: 'DESC'
+			}
+		});
 		if (!game) {
 			throw new NotFoundException(`Game Type: ${gametype} not found`);
 		}

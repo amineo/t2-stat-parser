@@ -14,7 +14,7 @@ export class GamesController {
 		return this.gameService.findAll({ limit, offset });
 	}
 
-	// /gametype/:gameId
+	// /gametype/:gametype
 	@Get('gametype/:gametype')
 	findByType(@Param('gametype') gametype: string) {
 		return this.gameService.findByType(gametype);
