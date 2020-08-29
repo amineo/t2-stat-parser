@@ -22,7 +22,8 @@ async function bootstrap() {
 		.setTitle('Tribes 2 Stats API')
 		.setDescription('Powering stats.playt2.com')
 		.setVersion('1.0')
-		.addTag('task')
+		.addTag('Game')
+		.addTag('Player')
 		.build();
 
 	const document = SwaggerModule.createDocument(app, swaggerOptions);

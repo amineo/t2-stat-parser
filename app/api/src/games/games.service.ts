@@ -41,12 +41,4 @@ export class GamesService {
 		}
 		return game;
 	}
-
-	async findOne(gameId: string) {
-		const game = await this.gamesRepository.findOne(gameId);
-		if (!game) {
-			throw new NotFoundException(`Game ID: ${gameId} not found`);
-		}
-		return game;
-	}
 }

@@ -9,7 +9,7 @@ export class GameController {
 
 	// /games/:gameId
 	@Get(':gameId')
-	@ApiOperation({ summary: 'Find game by Id' })
+	@ApiOperation({ tags: [ 'Game' ], summary: 'Find game by Id' })
 	findOne(@Param('gameId') gameId: string) {
 		return this.gameService.findOne(gameId);
 	}

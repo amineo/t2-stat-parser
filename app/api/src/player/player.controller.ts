@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { PlayerService } from './player.service';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 @Controller('player')
 export class PlayerController {
@@ -9,6 +9,7 @@ export class PlayerController {
 
 	// /player/:playerGuid
 	@Get(':playerGuid')
+	@ApiOperation({ tags: [ 'Player' ], summary: 'Return player stats by guid' })
 	findOne(@Param('playerGuid') playerGuid: string) {
 		return this.playerService.findOne(playerGuid);
 	}

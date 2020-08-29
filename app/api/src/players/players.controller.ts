@@ -1,4 +1,5 @@
 import { Controller, Get, Query, Param } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 
 import { PlayersService } from './players.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
@@ -9,14 +10,9 @@ export class PlayersController {
 
 	// /players
 	@Get()
+	@ApiOperation({ tags: [ 'Player' ], summary: 'Return a list of players' })
 	findAll(@Query() paginationQuery: PaginationQueryDto) {
 		const { limit = 10, offset = 0 } = paginationQuery;
 		return this.playerService.findAll({ limit, offset });
-	}
-
-	// /players/:playerGuid
-	@Get(':playerGuid')
-	findOne(@Param('playerGuid') playerGuid: string) {
-		return this.playerService.findOne(playerGuid);
 	}
 }
