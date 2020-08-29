@@ -36,7 +36,7 @@ export class GamesService {
 				gameId: 'DESC'
 			}
 		});
-		if (!game) {
+		if (!game.length) {
 			throw new NotFoundException(`Game Type: ${gametype} not found`);
 		}
 		return game;
