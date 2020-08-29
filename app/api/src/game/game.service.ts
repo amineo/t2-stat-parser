@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 
+import { Games } from '../games/entities/Games';
 import { GameDetail } from './entities/GameDetail';
 
 @Injectable()
@@ -10,11 +11,15 @@ export class GameService {
 	constructor(
 		private readonly connection: Connection,
 		private readonly configService: ConfigService,
+		@InjectRepository(Games) private readonly gamesRepository: Repository<Games>,
 		@InjectRepository(GameDetail) private readonly gameRepository: Repository<GameDetail>
 	) {}
 
 	async findOne(gameId: string) {
-		const game = await this.gameRepository.find({ where: { gameId: gameId } });
+		const game = await this.gameRepository.find({
+			relations: [ 'game', 'playerGuid' ],
+			where: [ { game: { gameId: gameId } } ]
+		});
 		if (!game) {
 			throw new NotFoundException(`Game ID: ${gameId} not found`);
 		}

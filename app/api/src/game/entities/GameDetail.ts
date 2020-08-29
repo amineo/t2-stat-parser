@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Games } from '../../games/entities/Games';
-import { Players } from '../../entities/Players';
+import { Players } from '../../players/entities/Players';
 
 @Index('games_pk', [ 'id' ], { unique: true })
 @Index('game_detail_uuid_key', [ 'uuid' ], { unique: true })
@@ -12,7 +13,7 @@ export class GameDetail {
 	@Column('text', { name: 'player_name' })
 	playerName: string;
 
-	@Column('numeric', { name: 'stat_overwrite' })
+	@Column('numeric', { name: 'stat_overwrite', select: false })
 	statOverwrite: string;
 
 	@Column('text', { name: 'map' })
@@ -40,7 +41,7 @@ export class GameDetail {
 	@JoinColumn([ { name: 'game_id', referencedColumnName: 'gameId' } ])
 	game: Games;
 
-	// @ManyToOne(() => Players, (players) => players.gameDetails)
-	// @JoinColumn([ { name: 'player_guid', referencedColumnName: 'playerGuid' } ])
-	// playerGuid: Players;
+	@ManyToOne(() => Players, (players) => players.gameDetails)
+	@JoinColumn([ { name: 'player_guid', referencedColumnName: 'playerGuid' } ])
+	playerGuid: Players;
 }

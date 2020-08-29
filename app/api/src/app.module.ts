@@ -8,6 +8,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GamesModule } from './games/games.module';
 import { GameModule } from './game/game.module';
+import { PlayersModule } from './players/players.module';
+import { PlayerModule } from './player/player.module';
 
 @Module({
 	imports: [
@@ -27,7 +29,9 @@ import { GameModule } from './game/game.module';
 			autoLoadEntities: true // models will be loaded automatically (you don't have to explicitly specify the entities: [] array)
 		}),
 		GamesModule,
-		GameModule
+		GameModule,
+		PlayersModule,
+		PlayerModule
 	],
 	controllers: [ AppController ],
 	providers: [ AppService ]

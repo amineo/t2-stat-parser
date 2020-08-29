@@ -8,8 +8,10 @@ import { GameService } from './game.service';
 import { GameDetail } from './entities/GameDetail';
 import { Games } from '../games/entities/Games';
 
+import { Players } from '../players/entities/Players';
+
 @Module({
-	imports: [ TypeOrmModule.forFeature([ Games, GameDetail ]), ConfigModule ],
+	imports: [ TypeOrmModule.forFeature([ Games, GameDetail, Players ]), ConfigModule ],
 	controllers: [ GameController ],
 	providers: [ GameService ]
 })

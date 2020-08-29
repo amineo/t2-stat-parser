@@ -22,10 +22,6 @@ export class Games {
 	})
 	createdAt: Date;
 
-	@OneToMany(() => GameDetail, (gameDetail) => Games.gameDetail)
+	@OneToMany(() => GameDetail, (gameDetail) => gameDetail.game)
 	gameDetails: GameDetail[];
-
-	@ManyToOne(() => Games, (games) => games.gameDetail)
-	@JoinColumn([ { name: 'game_id', referencedColumnName: 'gameId' } ])
-	game: Games;
 }

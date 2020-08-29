@@ -1,13 +1,13 @@
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { GameDetail } from '../game/entities/GameDetail';
+import { GameDetail } from '../../game/entities/GameDetail';
 
 @Index('players_pk', [ 'playerGuid' ], { unique: true })
 @Index('players_player_name_key', [ 'playerName' ], { unique: true })
 @Index('players_uuid_key', [ 'uuid' ], { unique: true })
 @Entity('players', { schema: 'public' })
 export class Players {
-	@PrimaryGeneratedColumn({ type: 'integer', name: 'id' })
-	id: number;
+	// @PrimaryGeneratedColumn({ type: 'integer', name: 'id' })
+	// id: number;
 
 	@Column('numeric', { primary: true, name: 'player_guid' })
 	playerGuid: string;
@@ -27,19 +27,20 @@ export class Players {
 	@Column('numeric', { name: 'total_games_sctfgame', default: () => '0' })
 	totalGamesSctfgame: string;
 
-	@Column('numeric', { name: 'stat_overwrite_ctfgame', default: () => '0' })
+	@Column('numeric', { name: 'stat_overwrite_ctfgame', select: false, default: () => '0' })
 	statOverwriteCtfgame: string;
 
-	@Column('numeric', { name: 'stat_overwrite_dmgame', default: () => '0' })
+	@Column('numeric', { name: 'stat_overwrite_dmgame', select: false, default: () => '0' })
 	statOverwriteDmgame: string;
 
 	@Column('numeric', {
 		name: 'stat_overwrite_lakrabbitgame',
+		select: false,
 		default: () => '0'
 	})
 	statOverwriteLakrabbitgame: string;
 
-	@Column('numeric', { name: 'stat_overwrite_sctfgame', default: () => '0' })
+	@Column('numeric', { name: 'stat_overwrite_sctfgame', select: false, default: () => '0' })
 	statOverwriteSctfgame: string;
 
 	@Column('text', { name: 'uuid', unique: true })
@@ -57,6 +58,6 @@ export class Players {
 	})
 	updatedAt: Date;
 
-	// @OneToMany(() => GameDetail, (gameDetail) => gameDetail.playerGuid)
-	// gameDetails: GameDetail[];
+	@OneToMany(() => GameDetail, (gameDetail) => gameDetail.playerGuid)
+	gameDetails: GameDetail[];
 }

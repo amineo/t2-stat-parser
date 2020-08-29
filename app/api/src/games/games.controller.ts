@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { GamesService } from './games.service';
 
+import { GamesService } from './games.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 @Controller('games')
