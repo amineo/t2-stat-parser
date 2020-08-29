@@ -7,6 +7,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
+	app.enableCors({
+		origin: [ /\.localhost$/, /\.playt2\.com$/ ],
+		credentials: true
+	});
+
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
@@ -27,7 +32,7 @@ async function bootstrap() {
 		.build();
 
 	const document = SwaggerModule.createDocument(app, swaggerOptions);
-	SwaggerModule.setup('api', app, document);
+	SwaggerModule.setup('docs', app, document);
 
 	await app.listen(3000);
 }

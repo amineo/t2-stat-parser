@@ -66,7 +66,6 @@ export class GameService {
 				game.teams.obs.score += totalFlagScore;
 				game.teams.obs.players.push(p);
 			}
-			console.log(player.stats.dtTeamGame);
 		}
 
 		//const teamZero: any = game; //game.find(({ stats }) => stats.dtTeamGame[0] === '3');
