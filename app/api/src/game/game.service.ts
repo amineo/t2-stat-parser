@@ -20,7 +20,8 @@ export class GameService {
 			relations: [ 'game', 'playerGuid' ],
 			where: [ { game: { gameId: gameId } } ]
 		});
-		if (!query) {
+
+		if (!query.length) {
 			throw new NotFoundException(`Game ID: ${gameId} not found`);
 		}
 

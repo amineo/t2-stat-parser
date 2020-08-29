@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -15,6 +17,16 @@ async function bootstrap() {
 			}
 		})
 	);
+
+	const swaggerOptions = new DocumentBuilder()
+		.setTitle('Tribes 2 Stats API')
+		.setDescription('Powering stats.playt2.com')
+		.setVersion('1.0')
+		.addTag('task')
+		.build();
+
+	const document = SwaggerModule.createDocument(app, swaggerOptions);
+	SwaggerModule.setup('api', app, document);
 
 	await app.listen(3000);
 }

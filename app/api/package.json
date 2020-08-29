@@ -1,8 +1,12 @@
 {
-  "name": "api",
+  "name": "playt2-stats-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Open-API powering stats.playt2.com",
+  "authors": {
+    "name": "Anthony Mineo",
+    "email": "anthonymineo@gmail.com",
+    "url": "https://anthonymineo.com"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
