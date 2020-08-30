@@ -25,19 +25,34 @@ export class GameService {
 			throw new NotFoundException(`Game ID: ${gameId} not found`);
 		}
 
-		// Need to set return based off gameType
+		const game: any = {
+			...query[0].game
+		};
 
-		if (query[0].gametype !== 'CTFGame') {
-			return query;
+		// Need to set return based off gameType
+		// Modify game object if not a CTF type game and return early
+		if (query[0].gametype !== 'CTFGame' && query[0].gametype !== 'SCtFGame') {
+			game['players'] = [];
+			for (const player of query) {
+				const { playerName, stats } = player;
+
+				const p = {
+					playerGuid: player.playerGuid.playerGuid,
+					playerName,
+					stats
+				};
+
+				game.players.push(p);
+			}
+
+			return game;
 		}
 
-		const game: any = {
-			...query[0].game,
-			teams: {
-				obs: { score: 0, players: [] },
-				storm: { score: 0, players: [] },
-				inferno: { score: 0, players: [] }
-			}
+		// Team Based game stats  (CTF/SCtF)
+		game['teams'] = {
+			obs: { score: 0, players: [] },
+			storm: { score: 0, players: [] },
+			inferno: { score: 0, players: [] }
 		};
 
 		for (const player of query) {
