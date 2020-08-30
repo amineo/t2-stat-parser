@@ -13,6 +13,7 @@ import { Players } from '../players/entities/Players';
 @Module({
 	imports: [ TypeOrmModule.forFeature([ Games, GameDetail, Players ]), ConfigModule ],
 	controllers: [ GameController ],
-	providers: [ GameService ]
+	providers: [ GameService ],
+	exports: [ GameService ]
 })
 export class GameModule {}

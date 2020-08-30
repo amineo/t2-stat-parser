@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 
 import { Games } from './entities/Games';
+import { GameService } from '../game/game.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class GamesService {
 	constructor(
 		private readonly connection: Connection,
 		private readonly configService: ConfigService,
+		private readonly gameService: GameService,
 		@InjectRepository(Games) private readonly gamesRepository: Repository<Games>
 	) {}
 
@@ -25,6 +27,27 @@ export class GamesService {
 		});
 
 		return games;
+	}
+
+	async findAllWithSummary(paginationQuery: PaginationQueryDto) {
+		const { limit, offset } = paginationQuery;
+		const games = await this.gamesRepository.find({
+			skip: offset,
+			take: limit,
+			order: {
+				gameId: 'DESC'
+			}
+		});
+
+		const withSummary = [];
+		for (const game of games) {
+			const summary = await this.gameService.findOne(game.gameId);
+			withSummary.push(summary);
+		}
+
+		//  Game findOne service needs to bubble up the game details as parent object and set players below it
+
+		return withSummary;
 	}
 
 	async findByType(gametype: string) {
