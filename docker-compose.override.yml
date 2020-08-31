@@ -2,48 +2,62 @@ version: "3.7"
 
 # Service Definitions
 services:
-
   db:
     environment:
       POSTGRES_DB: "t2_stats"
       POSTGRES_USER: "dev"
       POSTGRES_PASSWORD: "dev"
     ports:
-      - "5432:5432"      
-    volumes: 
+      - "5432:5432"
+    volumes:
       - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./build/postgres/export_local_db.sh:/export_local_db.sh 
-
+      - ./build/postgres/export_local_db.sh:/export_local_db.sh
 
   parser:
-    environment: 
+    environment:
       DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
     ports:
-      - "8000:8080"      
+      - "8000:8080"
     volumes:
       - ./app/t2-stat-parser:/app
 
-  web:
+  # web:
+  #   environment:
+  #     DB_USER: "dev"
+  #     DB_PASSWORD: "dev"
+  #     CACHE_VIEWS: "false"
+  #     NODE_ENV: "development" # auto-reloads app on save, dev builds
+  #     WEBPACK_HMR: "true" # default is false -- this is useful for when you're focused on Frontend Dev
+  #   ports:
+  #     - "8080:8080" # adonis http port
+  #     - "8081:8081" # webpack-dev-server port
+  #   volumes:
+  #     - ./app/webapp:/app
+
+  api:
     environment:
-      DB_USER: "dev"
-      DB_PASSWORD: "dev"
-      
-      CACHE_VIEWS: "false"
-      NODE_ENV: "development" # auto-reloads app on save, dev builds
-      WEBPACK_HMR: "true" # default is false -- this is useful for when you're focused on Frontend Dev
+      NODE_ENV: "development" # auto-reloads app on save
+
+    env_file:
+      - .env
     ports:
-      - "8080:8080" # adonis http port
-      - "8081:8081" # webpack-dev-server port
+      - "8080:8080"
     volumes:
-      - ./app/webapp:/app
+      - ./build/api/ecosystem._PROD_.config.js:/opt/node_app/ecosystem._PROD_.config.js
+      - ./build/api/ecosystem._DEV_.config.js:/opt/node_app/ecosystem._DEV_.config.js
+      - ./app/api:/opt/node_app/app:delegated
 
-  # api:
-  #   volumes: 
-  #     - ./app/api:/home/node/app
-
-
+      # temp vols
+      - notused:/opt/node_app/app/node_modules
+      - builtincontainer:/opt/node_app/app/dist
+    networks:
+      - internal
 
 secrets:
   adonis.appkey:
     external: false
     file: ./docker-secrets/adonis.appkey.v1
+
+volumes:
+  notused:
+  builtincontainer:

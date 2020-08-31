@@ -43,48 +43,46 @@ services:
       mode: replicated
       replicas: 1
 
-  web:
-    image: "amineo/t2-stats-web:v0.1.0-rc6"
+  api:
+    image: "amineo/t2-stats-api:v0.0.1"
     build:
       context: .
-      dockerfile: ./build/webapp/Dockerfile
+      dockerfile: ./build/api/Dockerfile
     environment:
       NODE_ENV: "production" # set as default in image
-      CACHE_VIEWS: "true" # set as default in image
-      APP_NAME: "Web" # set as default in image
-
-      #     APP_KEY: "You-need-to-generate-this (npx adonis key:generate --echo)"
-      APP_KEY_FILE: /run/secrets/adonis.appkey
-
-      DB_HOST: "db"
-      DB_PORT: 5432
-      DB_USER: ""
-      DB_PASSWORD: ""
-      DB_DATABASE: t2_stats
-
-    secrets:
-      - adonis.appkey
-    ports:
-      - "8080:8080"
+      APP_NAME: "T2StatsAPI" # set as default in image
+    depends_on:
+      - db
     networks:
       - internal
       - external
-    deploy:
-      # labels:
-      #   - traefik.enable=false
-      mode: replicated
-      replicas: 1
 
-  # api:
-  #   image: "node:12-alpine"
-  #   depends_on:
-  #     - db
+  # web:
+  #   image: "amineo/t2-stats-web:v0.1.0-rc6"
+  #   build:
+  #     context: .
+  #     dockerfile: ./build/webapp/Dockerfile
+  #   environment:
+  #     NODE_ENV: "production" # set as default in image
+  #     CACHE_VIEWS: "true" # set as default in image
+  #     APP_NAME: "Web" # set as default in image
+  #     #     APP_KEY: "You-need-to-generate-this (npx adonis key:generate --echo)"
+  #     APP_KEY_FILE: /run/secrets/adonis.appkey
+  #     DB_HOST: "db"
+  #     DB_PORT: 5432
+  #     DB_USER: ""
+  #     DB_PASSWORD: ""
+  #     DB_DATABASE: t2_stats
+  #   secrets:
+  #     - adonis.appkey
+  #   ports:
+  #     - "8080:8080"
   #   networks:
   #     - internal
   #     - external
   #   deploy:
-  #     labels:
-  #       - traefik.enable=true
+  #     # labels:
+  #     #   - traefik.enable=false
   #     mode: replicated
   #     replicas: 1
 
