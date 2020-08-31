@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -5,7 +6,13 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	// Use local gen'd cert in container
+	const httpsOptions = {
+		key: fs.readFileSync('/localcert/key.pem', 'utf8'),
+		cert: fs.readFileSync('/localcert/cert.pem', 'utf8')
+	};
+
+	const app = await NestFactory.create(AppModule, { httpsOptions });
 
 	app.enableCors({
 		credentials: true
@@ -33,6 +40,6 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, swaggerOptions);
 	SwaggerModule.setup('docs', app, document);
 
-	await app.listen(8080);
+	await app.listen(8443);
 }
 bootstrap();

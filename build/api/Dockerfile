@@ -23,7 +23,7 @@ RUN apk update && apk add --no-cache openssl bash curl
 
 # Default envs as prod
 ENV HOST=0.0.0.0 \
-    PORT=8080 \
+    PORT=8443 \
     NODE_ENV=production \
     APP_NAME=NestJS
 
@@ -42,7 +42,7 @@ WORKDIR /opt/node_app
 #USER node
 
 # Generate a localhost cert
-# RUN openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout /localcert/key.pem -out /localcert/cert.pem -subj "/C=US/ST=New Jersey/L=Warren/O=localhost/OU=IT/CN=127.0.0.1"
+RUN openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout /localcert/key.pem -out /localcert/cert.pem -subj "/C=US/ST=New Jersey/L=Warren/O=localhost/OU=IT/CN=127.0.0.1"
 
 
 ENV PATH /opt/node_app/node_modules/.bin:$PATH
@@ -62,9 +62,9 @@ COPY ./app/api/package.json ./app/api/package-lock.json* ./
 COPY ./build/api/ecosystem._PROD_.config.js  /opt/node_app/ecosystem._PROD_.config.js
 COPY ./build/api/entrypoint.sh /entrypoint.sh
 
-EXPOSE 8080
+EXPOSE 8080 8443
 
 HEALTHCHECK --interval=20s --timeout=30s --start-period=5s --retries=5 \
-    CMD curl -f -k http://localhost:8080/ || exit 1
+    CMD curl -f -k https://localhost:8443/ || exit 1
 
 ENTRYPOINT [ "/entrypoint.sh" ]
