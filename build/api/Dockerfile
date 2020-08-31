@@ -65,6 +65,6 @@ COPY ./build/api/entrypoint.sh /entrypoint.sh
 EXPOSE 8080
 
 HEALTHCHECK --interval=20s --timeout=30s --start-period=5s --retries=5 \
-    CMD curl -f -k https://localhost:8443/healthz || exit 1
+    CMD curl -f -k http://localhost:8080/ || exit 1
 
 ENTRYPOINT [ "/entrypoint.sh" ]
