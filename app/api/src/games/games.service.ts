@@ -64,4 +64,27 @@ export class GamesService {
 		}
 		return game;
 	}
+
+	async findByTypeWithSummary(gametype: string, paginationQuery: PaginationQueryDto) {
+		const { limit, offset } = paginationQuery;
+		const games = await this.gamesRepository.find({
+			where: { gametype: gametype },
+			skip: offset,
+			take: limit,
+			order: {
+				gameId: 'DESC'
+			}
+		});
+		if (!games.length) {
+			throw new NotFoundException(`Game Type: ${gametype} not found`);
+		}
+
+		const withSummary = [];
+		for (const game of games) {
+			const summary = await this.gameService.findOne(game.gameId);
+			withSummary.push(summary);
+		}
+
+		return withSummary;
+	}
 }

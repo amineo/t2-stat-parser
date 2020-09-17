@@ -42,6 +42,7 @@ services:
       - .env
     ports:
       - "8080:8080"
+      - "8443:8443"
     volumes:
       - ./build/api/ecosystem._PROD_.config.js:/opt/node_app/ecosystem._PROD_.config.js
       - ./build/api/ecosystem._DEV_.config.js:/opt/node_app/ecosystem._DEV_.config.js

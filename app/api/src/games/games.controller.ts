@@ -25,10 +25,19 @@ export class GamesController {
 		return this.gamesService.findAllWithSummary({ limit, offset });
 	}
 
-	// /gametype/:gametype
+	// /games/gametype/:gametype
 	@Get('gametype/:gametype')
 	@ApiOperation({ tags: [ 'Game' ], summary: 'Return the latest games by game type' })
 	findByType(@Param('gametype') gametype: string) {
 		return this.gamesService.findByType(gametype);
+	}
+
+	// /games/gametype/CTFGame/summary
+	@Get('gametype/:gametype/summary')
+	@ApiOperation({ tags: [ 'Game' ], summary: 'Return the latest games by game type with game summaries' })
+	findByTypeWithSummary(@Param('gametype') gametype: string, @Query() paginationQuery: PaginationQueryDto) {
+		const { limit = 10, offset = 0 } = paginationQuery;
+
+		return this.gamesService.findByTypeWithSummary(gametype, { limit, offset });
 	}
 }
