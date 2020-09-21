@@ -18,9 +18,11 @@ export class GamesService {
 
 	async findAll(paginationQuery: PaginationQueryDto) {
 		const { limit, offset } = paginationQuery;
+		const returnMaxLimit = Math.min(300, Math.max(0, limit));
+
 		const games = await this.gamesRepository.find({
 			skip: offset,
-			take: limit,
+			take: returnMaxLimit,
 			order: {
 				gameId: 'DESC'
 			}
@@ -31,9 +33,12 @@ export class GamesService {
 
 	async findAllWithSummary(paginationQuery: PaginationQueryDto) {
 		const { limit, offset } = paginationQuery;
+
+		const returnMaxLimit = Math.min(100, Math.max(0, limit));
+
 		const games = await this.gamesRepository.find({
 			skip: offset,
-			take: limit,
+			take: returnMaxLimit,
 			order: {
 				gameId: 'DESC'
 			}
@@ -67,10 +72,13 @@ export class GamesService {
 
 	async findByTypeWithSummary(gametype: string, paginationQuery: PaginationQueryDto) {
 		const { limit, offset } = paginationQuery;
+
+		const returnMaxLimit = Math.min(100, Math.max(0, limit));
+
 		const games = await this.gamesRepository.find({
 			where: { gametype: gametype },
 			skip: offset,
-			take: limit,
+			take: returnMaxLimit,
 			order: {
 				gameId: 'DESC'
 			}

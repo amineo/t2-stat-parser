@@ -18,11 +18,14 @@ export class PlayersService {
 
 	async findAll(paginationQuery: PaginationQueryDto) {
 		const { limit, offset } = paginationQuery;
+
+		const returnMaxLimit = Math.min(300, Math.max(0, limit));
+
 		const players = await this.playersRepository.find({
 			skip: offset,
-			take: limit,
+			take: returnMaxLimit,
 			order: {
-				playerName: 'DESC'
+				updatedAt: 'DESC'
 			}
 		});
 
