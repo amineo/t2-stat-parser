@@ -617,7 +617,17 @@ function formatPlayerStats(statObj: any) {
 		mannedTurretKillsTG: Number(statObj.stats.mannedTurretKillsTG),
 		depStationDestroysTG: Number(statObj.stats.depStationDestroysTG),
 		mpbtstationRepairsTG: Number(statObj.stats.mpbtstationRepairsTG),
-		mpbtstationDestroysTG: Number(statObj.stats.mpbtstationDestroysTG)
+		mpbtstationDestroysTG: Number(statObj.stats.mpbtstationDestroysTG),
+		dtTurretKillsTG: Number(statObj.stats.dtTurretKillsTG),
+		mineDiscAccMPAvg: Number(statObj.stats.mineDiscAccMPAvg),
+		mineKillAGroundAirTG: Number(statObj.stats.mineKillAGroundAirTG),
+		mineKillAGroundGroundTG: Number(statObj.stats.mineKillAGroundGroundTG),
+		satchelKillAGroundAirTG: Number(statObj.stats.satchelKillAGroundAirTG),
+		satchelKillAGroundGroundTG: Number(statObj.stats.satchelKillAGroundGroundTG),
+		mineDiscPctAvg: Number(statObj.stats.mineDiscPctAvg),
+		mineDiscHitTG: Number(statObj.stats.mineDiscHitTG),
+		mineDiscAccAvg: Number(statObj.stats.mineDiscAccAvg),
+		mineDiscShotsTG: Number(statObj.stats.mineDiscShotsTG)
 	};
 }
 
