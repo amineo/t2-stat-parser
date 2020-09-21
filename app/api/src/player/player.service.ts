@@ -6,6 +6,8 @@ import { Connection, Repository } from 'typeorm';
 import { Players } from '../players/entities/Players';
 import { GameDetail } from '../game/entities/GameDetail';
 
+import formatPlayerStats from '../common/util/formatStats';
+
 @Injectable()
 export class PlayerService {
 	constructor(
@@ -23,6 +25,31 @@ export class PlayerService {
 		if (!player) {
 			throw new NotFoundException(`Player GUID: ${playerGuid} not found`);
 		}
-		return player;
+
+		const gameDetails = [];
+
+		for (const game in player.gameDetails) {
+			const g = player.gameDetails[game];
+
+			const stats = formatPlayerStats(g);
+
+			gameDetails.push({ ...g, stats });
+		}
+
+		const formattedStats = {
+			...player,
+			totalGamesCtfgame: Number(player.totalGamesCtfgame),
+			totalGamesDmgame: Number(player.totalGamesDmgame),
+			totalGamesSctfgame: Number(player.totalGamesSctfgame),
+			totalGamesLakrabbitgame: Number(player.totalGamesLakrabbitgame),
+			totalGames:
+				Number(player.totalGamesCtfgame) +
+				Number(player.totalGamesDmgame) +
+				Number(player.totalGamesSctfgame) +
+				Number(player.totalGamesLakrabbitgame),
+			gameDetails
+		};
+
+		return formattedStats;
 	}
 }

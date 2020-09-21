@@ -6,6 +6,8 @@ import { Connection, Repository } from 'typeorm';
 import { Games } from '../games/entities/Games';
 import { GameDetail } from './entities/GameDetail';
 
+import formatPlayerStats from '../common/util/formatStats';
+
 @Injectable()
 export class GameService {
 	constructor(
@@ -34,7 +36,8 @@ export class GameService {
 		if (query[0].gametype !== 'CTFGame' && query[0].gametype !== 'SCtFGame') {
 			game['players'] = [];
 			for (const player of query) {
-				const { playerName, stats } = player;
+				const { playerName } = player;
+				const stats = formatPlayerStats(player);
 
 				const p = {
 					playerGuid: player.playerGuid.playerGuid,
@@ -56,7 +59,8 @@ export class GameService {
 		};
 
 		for (const player of query) {
-			const { playerName, stats } = player;
+			const { playerName } = player;
+			const stats = formatPlayerStats(player);
 
 			const p = {
 				playerGuid: player.playerGuid.playerGuid,
