@@ -22,6 +22,7 @@ export class PlayerService {
 			relations: [ 'gameDetails' ],
 			where: [ { playerGuid: playerGuid } ]
 		});
+
 		if (!player) {
 			throw new NotFoundException(`Player GUID: ${playerGuid} not found`);
 		}
@@ -36,6 +37,39 @@ export class PlayerService {
 			gameDetails.push({ ...g, stats });
 		}
 
+		/* stat sum */
+		// Dynamically generate and sum the statTotals object
+		// This is dirty and should be cleaned up but will do for now :)
+		const playerStatTotals = {},
+			statKeys = Object.keys(gameDetails[0].stats);
+
+		for (let i = 0; i < statKeys.length; i++) {
+			if (
+				statKeys[i] === 'map' ||
+				statKeys[i] === 'dateStamp' ||
+				statKeys[i] === 'timeDayMonth' ||
+				statKeys[i] === 'gameID' ||
+				statKeys[i] === 'mapID'
+			) {
+				continue;
+			}
+			playerStatTotals[statKeys[i]] = 0;
+		}
+
+		gameDetails.map((statLine) => {
+			// look through each object in playerStatsData array
+			for (const [ key, value ] of Object.entries(statLine.stats)) {
+				//  console.log(`${key}: ${value}`);
+				// If the stat item exists, add it -- if not create a new key in playerStatTotals
+				if (playerStatTotals.hasOwnProperty(key) === true) {
+					playerStatTotals[key] = playerStatTotals[key] + Number(value);
+				} else {
+					playerStatTotals[key] = Number(value);
+				}
+			}
+		});
+		/* end stat sum */
+
 		const formattedStats = {
 			...player,
 			totalGamesCtfgame: Number(player.totalGamesCtfgame),
@@ -47,7 +81,8 @@ export class PlayerService {
 				Number(player.totalGamesDmgame) +
 				Number(player.totalGamesSctfgame) +
 				Number(player.totalGamesLakrabbitgame),
-			gameDetails
+			gameDetails: gameDetails.sort((a, b) => b.id - a.id),
+			statTotals: playerStatTotals
 		};
 
 		return formattedStats;
