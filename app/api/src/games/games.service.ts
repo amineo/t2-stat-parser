@@ -28,7 +28,14 @@ export class GamesService {
 			}
 		});
 
-		return games;
+		const abvSummary = [];
+		for (const game of games) {
+			const summary = await this.gameService.findOneAbvSummary(game.gameId);
+			abvSummary.push(summary);
+		}
+
+		// Only return games when the score is 100 or greater
+		return abvSummary.filter((g) => g.totalScore >= 100);
 	}
 
 	async findAllWithSummary(paginationQuery: PaginationQueryDto) {
@@ -50,13 +57,11 @@ export class GamesService {
 			withSummary.push(summary);
 		}
 
-		//  Game findOne service needs to bubble up the game details as parent object and set players below it
-
 		return withSummary;
 	}
 
 	async findByType(gametype: string) {
-		const game = await this.gamesRepository.find({
+		const games = await this.gamesRepository.find({
 			where: { gametype: gametype },
 			skip: 0,
 			take: 10,
@@ -64,10 +69,18 @@ export class GamesService {
 				gameId: 'DESC'
 			}
 		});
-		if (!game.length) {
+		if (!games.length) {
 			throw new NotFoundException(`Game Type: ${gametype} not found`);
 		}
-		return game;
+
+		const abvSummary = [];
+		for (const game of games) {
+			const summary = await this.gameService.findOneAbvSummary(game.gameId);
+			abvSummary.push(summary);
+		}
+
+		// Only return games when the score is 100 or greater
+		return abvSummary.filter((g) => g.totalScore >= 100);
 	}
 
 	async findByTypeWithSummary(gametype: string, paginationQuery: PaginationQueryDto) {
