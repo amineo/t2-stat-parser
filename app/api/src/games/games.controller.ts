@@ -28,8 +28,9 @@ export class GamesController {
 	// /games/gametype/:gametype
 	@Get('gametype/:gametype')
 	@ApiOperation({ tags: [ 'Game' ], summary: 'Return the latest games by game type' })
-	findByType(@Param('gametype') gametype: string) {
-		return this.gamesService.findByType(gametype);
+	findByType(@Param('gametype') gametype: string, @Query() paginationQuery: PaginationQueryDto) {
+		const { limit = 10, offset = 0 } = paginationQuery;
+		return this.gamesService.findByType(gametype, { limit, offset });
 	}
 
 	// /games/gametype/CTFGame/summary

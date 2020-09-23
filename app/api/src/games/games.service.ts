@@ -34,8 +34,8 @@ export class GamesService {
 			abvSummary.push(summary);
 		}
 
-		// Only return games when the score is 100 or greater
-		return abvSummary.filter((g) => g.totalScore >= 100);
+		// Only return games when the score is greater than 1
+		return abvSummary.filter((g) => g.totalScore > 1);
 	}
 
 	async findAllWithSummary(paginationQuery: PaginationQueryDto) {
@@ -60,11 +60,14 @@ export class GamesService {
 		return withSummary;
 	}
 
-	async findByType(gametype: string) {
+	async findByType(gametype: string, paginationQuery: PaginationQueryDto) {
+		const { limit, offset } = paginationQuery;
+		const returnMaxLimit = Math.min(100, Math.max(0, limit));
+
 		const games = await this.gamesRepository.find({
 			where: { gametype: gametype },
-			skip: 0,
-			take: 10,
+			skip: offset,
+			take: returnMaxLimit,
 			order: {
 				gameId: 'DESC'
 			}
@@ -79,8 +82,8 @@ export class GamesService {
 			abvSummary.push(summary);
 		}
 
-		// Only return games when the score is 100 or greater
-		return abvSummary.filter((g) => g.totalScore >= 100);
+		// Only return games when the score is greater than 1
+		return abvSummary.filter((g) => g.totalScore > 1);
 	}
 
 	async findByTypeWithSummary(gametype: string, paginationQuery: PaginationQueryDto) {
