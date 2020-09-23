@@ -29,8 +29,8 @@ RUN apk update && apk add --no-cache wget tzdata
 #Set TimeZone
 ENV TZ=America/New_York
 
-#Set cron schedule  (every day at 11:30am est)
-RUN echo '30 11 * * * /app/start.sh' > /etc/crontabs/root
+# #Set cron schedule  (every day at 11:30am est)
+# RUN echo '30 11 * * * /app/start.sh' > /etc/crontabs/root
 
 WORKDIR /app
 
@@ -38,4 +38,5 @@ COPY --from=builder /app/main /app/main
 COPY ./app/t2-stat-parser/start.sh /app/start.sh
 COPY ./app/t2-stat-parser/parser-daemon.sh /app/parser-daemon.sh
 
-ENTRYPOINT ./parser-daemon.sh
+#ENTRYPOINT ./parser-daemon.sh
+ENTRYPOINT ./start.sh
