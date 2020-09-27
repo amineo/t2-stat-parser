@@ -81,7 +81,9 @@ export class PlayerService {
 				Number(player.totalGamesDmgame) +
 				Number(player.totalGamesSctfgame) +
 				Number(player.totalGamesLakrabbitgame),
-			gameDetails: gameDetails.sort((a, b) => b.id - a.id).filter((g) => g.stats.scoreTG > 0),
+			gameDetails: gameDetails
+				.filter((g) => g.stats.scoreTG > 0)
+				.sort((a, b) => Number(b.stats.gameID) - Number(a.stats.gameID)),
 			statTotals: playerStatTotals
 		};
 
