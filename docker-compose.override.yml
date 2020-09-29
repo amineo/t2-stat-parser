@@ -21,19 +21,6 @@ services:
     volumes:
       - ./app/t2-stat-parser:/app
 
-  # web:
-  #   environment:
-  #     DB_USER: "dev"
-  #     DB_PASSWORD: "dev"
-  #     CACHE_VIEWS: "false"
-  #     NODE_ENV: "development" # auto-reloads app on save, dev builds
-  #     WEBPACK_HMR: "true" # default is false -- this is useful for when you're focused on Frontend Dev
-  #   ports:
-  #     - "8080:8080" # adonis http port
-  #     - "8081:8081" # webpack-dev-server port
-  #   volumes:
-  #     - ./app/webapp:/app
-
   api:
     environment:
       NODE_ENV: "development" # auto-reloads app on save

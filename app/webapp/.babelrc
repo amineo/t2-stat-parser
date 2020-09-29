@@ -1,6 +1,0 @@
-{
-  "plugins": [
-    "macros",
-    "@babel/plugin-proposal-class-properties"
-  ]
-}
