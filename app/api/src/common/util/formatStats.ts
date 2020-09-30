@@ -4,6 +4,7 @@
 function formatPlayerStats(statObj: any) {
 	return {
 		...statObj.stats,
+		teamScoreGame: Number(statObj.stats.teamScoreGame),
 		masTG: Number(statObj.stats.masTG),
 		cgMATG: Number(statObj.stats.cgMATG),
 		kdrAvg: Number(statObj.stats.kdrAvg),
