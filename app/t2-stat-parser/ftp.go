@@ -26,10 +26,11 @@ func initFTP() {
 	ftpHOST := os.Getenv("FTP_HOST")
 	ftpUSER := os.Getenv("FTP_USER")
 	ftpPW := os.Getenv("FTP_PW")
+	ftpPath := os.Getenv("FTP_PATH")
 
-	fmt.Println("Downloading stat files from", ftpHOST)
+	fmt.Println("Downloading stat files from", ftpHOST + ftpPath)
 
-	err, out, errout := Shellout("wget --recursive -nH --cut-dirs=4 --user=" + ftpUSER + " --no-parent --password=" + ftpPW + " -P /app/serverStats/stats/ ftp://" + ftpHOST + "/" + ftpHOST + "Tribes2/GameData/Classic/serverStats/stats/")
+	err, out, errout := Shellout("wget --recursive -nH --cut-dirs=4 --user=" + ftpUSER + " --no-parent --password=" + ftpPW + " -P /app/serverStats/stats/ ftp://" + ftpHOST + ftpPath)
 
 
 

@@ -24,7 +24,7 @@ services:
         constraints: [node.role == manager]
 
   parser:
-    image: "amineo/t2-stats-parser:v0.4.0"
+    image: "amineo/t2-stats-parser:v0.4.1"
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
@@ -33,6 +33,7 @@ services:
       FTP_HOST: "${FTP_HOST}"
       FTP_USER: "${FTP_USER}"
       FTP_PW: "${FTP_PW}"
+      FTP_PATH: "${FTP_PATH}"
     depends_on:
       - db
     networks:
