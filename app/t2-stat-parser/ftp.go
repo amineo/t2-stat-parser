@@ -29,7 +29,10 @@ func initFTP() {
 
 	fmt.Println("Downloading stat files from", ftpHOST)
 
-	err, out, errout := Shellout("wget --recursive -nH --cut-dirs=4 --user=" + ftpUSER + " --no-parent --password=" + ftpPW + " -P /app/serverStats/stats/ ftp://" + ftpHOST + "/" + ftpHOST + "_port_28000/classic/serverStats/stats/")
+	err, out, errout := Shellout("wget --recursive -nH --cut-dirs=4 --user=" + ftpUSER + " --no-parent --password=" + ftpPW + " -P /app/serverStats/stats/ ftp://" + ftpHOST + "/" + ftpHOST + "Tribes2/GameData/Classic/serverStats/stats/")
+
+
+
 	if err != nil {
 		log.Printf("error: %v\n", err)
 	}

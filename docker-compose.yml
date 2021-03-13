@@ -24,7 +24,7 @@ services:
         constraints: [node.role == manager]
 
   parser:
-    image: "amineo/t2-stats-parser:v0.3.0"
+    image: "amineo/t2-stats-parser:v0.4.0"
     build:
       context: .
       dockerfile: ./build/go-t2-stat-parser/Dockerfile
