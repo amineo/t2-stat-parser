@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 //ShellToUse is...
@@ -24,14 +25,15 @@ func Shellout(command string) (error, string, string) {
 func initFTP() {
 
 	ftpHOST := os.Getenv("FTP_HOST")
-	ftpUSER := os.Getenv("FTP_USER")
-	ftpPW := os.Getenv("FTP_PW")
 	ftpPath := os.Getenv("FTP_PATH")
+	ftpUSER := os.Getenv("FTP_USER")
+	ftpPW   := strings.Replace(os.Getenv("FTP_PW"), `\\`, `\`, -1)
 
 	fmt.Println("Downloading stat files from", ftpHOST + ftpPath)
 
-	err, out, errout := Shellout("wget --recursive -nH --cut-dirs=4 --user=" + ftpUSER + " --no-parent --password=" + ftpPW + " -P /app/serverStats/stats/ ftp://" + ftpHOST + ftpPath)
+	cmd := "wget --recursive --no-passive-ftp -nH --cut-dirs=4 --ftp-user=" + ftpUSER + " --no-parent --ftp-password="+ ftpPW +" -P /app/serverStats/stats/ ftp://" + ftpHOST + ftpPath
 
+	err, out, errout := Shellout(cmd)
 
 
 	if err != nil {
@@ -43,3 +45,5 @@ func initFTP() {
 	fmt.Println(errout)
 
 }
+
+
