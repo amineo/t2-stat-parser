@@ -31,7 +31,12 @@ func initFTP() {
 
 	fmt.Println("Downloading stat files from", ftpHOST + ftpPath)
 
-	cmd := "wget --recursive --no-passive-ftp -nH --cut-dirs=4 --ftp-user=" + ftpUSER + " --no-parent --ftp-password="+ ftpPW +" -P /app/serverStats/stats/ ftp://" + ftpHOST + ftpPath
+	// wget is a bit buggy with FTP in v1.20.x
+	//	cmd := "wget --recursive --no-passive-ftp -nH --cut-dirs=4 --ftp-user=" + ftpUSER + " --no-parent --ftp-password="+ ftpPW +" -P /app/serverStats/stats/ ftp://" + ftpHOST + ftpPath
+
+	cmd := "lftp -c 'open "+ftpHOST+"; user "+ftpUSER+" "+ftpPW+"; mirror -e "+ftpPath+" /app/serverStats/stats/; quit'"
+	
+
 
 	err, out, errout := Shellout(cmd)
 

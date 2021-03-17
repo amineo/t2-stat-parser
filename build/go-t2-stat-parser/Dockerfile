@@ -24,7 +24,7 @@ RUN go build -o main .
 FROM golang:1.14-alpine
 LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
 
-RUN apk update && apk add --no-cache wget tzdata
+RUN apk update && apk add --no-cache wget tzdata lftp
 
 #Set TimeZone
 ENV TZ=America/New_York
