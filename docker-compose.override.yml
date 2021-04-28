@@ -41,10 +41,6 @@ services:
     networks:
       - internal
 
-secrets:
-  adonis.appkey:
-    external: false
-    file: ./docker-secrets/adonis.appkey.v1
 
 volumes:
   notused:

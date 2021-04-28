@@ -64,8 +64,3 @@ volumes:
 networks:
   external:
   internal:
-
-secrets:
-  adonis.appkey:
-    external: true
-    name: adonis.appkey.v1
