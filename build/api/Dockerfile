@@ -43,7 +43,7 @@ WORKDIR /opt/node_app
 #USER node
 
 # Generate a localhost cert
-RUN openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout /localcert/key.pem -out /localcert/cert.pem -subj "/C=US/ST=New Jersey/L=Warren/O=localhost/OU=IT/CN=127.0.0.1"
+RUN openssl req -newkey rsa:2048 -new -nodes -x509 -days 360 -keyout /localcert/key.pem -out /localcert/cert.pem -subj "/C=US/ST=New Jersey/L=Warren/O=localhost/OU=IT/CN=127.0.0.1"
 
 
 ENV PATH /opt/node_app/node_modules/.bin:$PATH
