@@ -12,7 +12,7 @@ services:
     volumes:
       - ./build/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ./build/postgres/export_local_db.sh:/export_local_db.sh
-      - ./build/postgres/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      # - ./build/postgres/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   parser:
     environment:
@@ -41,15 +41,15 @@ services:
       - builtincontainer:/opt/node_app/app/dist
 
 
-  pghero:
-    image: ankane/pghero
-    ports:
-      - "9999:8080"
-    environment:
-      DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
-    networks:
-      - internal
-      - external
+  # pghero:
+  #   image: ankane/pghero
+  #   ports:
+  #     - "9999:8080"
+  #   environment:
+  #     DATABASE_URL: "postgres://dev:dev@db:5432/t2_stats"
+  #   networks:
+  #     - internal
+  #     - external
 
 
 
