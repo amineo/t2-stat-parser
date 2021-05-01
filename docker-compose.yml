@@ -45,7 +45,7 @@ services:
       replicas: 1
 
   api:
-    image: "amineo/t2-stats-api:v0.0.16"
+    image: "amineo/t2-stats-api:v0.0.17"
     build:
       context: .
       dockerfile: ./build/api/Dockerfile
