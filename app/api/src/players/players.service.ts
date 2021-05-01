@@ -62,8 +62,8 @@ export class PlayersService {
 
 		const hitsValue = '(game.stats->:hitsStat->>0)::integer';
 		const shotsValue = '(game.stats->:shotsStat->>0)::integer';
-		const discJumpsValue = "(game.stats->'discJumpTG'->>0)::integer";
-		const killerDiscJumpsValue = "(game.stats->'killerDiscJumpTG'->>0)::integer";
+		const discJumpsValue = "COALESCE((game.stats->'discJumpTG'->>0)::integer, 0)";
+		const killerDiscJumpsValue = "COALESCE((game.stats->'killerDiscJumpTG'->>0)::integer, 0)";
 
 		// pgSQL doesn't let you reference aliased selections you've made in the
 		// same select statement, so unfortunately these computed JSON values are
@@ -79,9 +79,9 @@ export class PlayersService {
 		let aggregatedShots = `SUM(${shotsValue})::integer`;
 		if (excludeDiscJumps) {
 			// Since subtracting disc jumps could theoretically drop the shots count
-			// to 0, clamp it to at least the number of hits, otherwise it'd be
-			// possible to have >100% accuracy.
-			aggregatedShots = `GREATEST(${aggregatedHits}, ${aggregatedShots} - ${aggregatedDiscJumps})`
+			// to 0, clamp it to at least the number of hits or 1, otherwise it'd be
+			// possible to divide by zero.
+			aggregatedShots = `GREATEST(1, ${aggregatedHits}, ${aggregatedShots} - ${aggregatedDiscJumps})`
 		}
 
 		// Cast to float to avoid integer division truncating the result.
