@@ -9,8 +9,8 @@ import { Players } from './entities/Players';
 import { GameDetail } from '../game/entities/GameDetail';
 
 @Module({
-	imports: [ TypeOrmModule.forFeature([ Players, GameDetail ]), ConfigModule ],
-	providers: [ PlayersService ],
-	controllers: [ PlayersController ]
+	imports: [TypeOrmModule.forFeature([Players, GameDetail]), ConfigModule],
+	providers: [PlayersService],
+	controllers: [PlayersController],
 })
 export class PlayersModule {}

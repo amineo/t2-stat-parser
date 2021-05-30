@@ -1,9 +1,6 @@
 import { IsOptional, IsPositive, IsNotEmpty, IsIn, Max } from 'class-validator';
 
-const filterableGameTypes = [
-  'CTFGame',
-  'LakRabbitGame'
-] as const;
+const filterableGameTypes = ['CTFGame', 'LakRabbitGame'] as const;
 
 type FilterableGameType = typeof filterableGameTypes[number];
 
@@ -14,12 +11,12 @@ const hitStats = [
 	'laserHitsTG',
 	'laserMATG',
 	'cgHitsTG',
-	'shockHitsTG'
+	'shockHitsTG',
 ] as const;
 
 type Stat = typeof hitStats[number];
 
-export class TopPlayersQueryDto {
+export class TopAccuracyQueryDto {
 	@IsNotEmpty()
 	@IsIn(hitStats as any)
 	stat: Stat;
@@ -35,6 +32,17 @@ export class TopPlayersQueryDto {
 	@IsOptional()
 	@IsPositive()
 	minShots: number;
+
+	@IsOptional()
+	@IsPositive()
+	@Max(100)
+	limit: number;
+}
+
+export class TopWinsQueryDto {
+	@IsOptional()
+	@IsPositive()
+	minGames: number;
 
 	@IsOptional()
 	@IsPositive()

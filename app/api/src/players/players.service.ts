@@ -6,15 +6,20 @@ import { Connection, Repository } from 'typeorm';
 import { Players } from './entities/Players';
 import { GameDetail } from '../game/entities/GameDetail';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
-import { TopPlayersQueryDto } from '../common/dto/top-players-query.dto';
+import {
+	TopAccuracyQueryDto,
+	TopWinsQueryDto,
+} from '../common/dto/top-players-query.dto';
 
 @Injectable()
 export class PlayersService {
 	constructor(
 		private readonly connection: Connection,
 		private readonly configService: ConfigService,
-		@InjectRepository(Players) private readonly playersRepository: Repository<Players>,
-		@InjectRepository(GameDetail) private readonly gameRepository: Repository<GameDetail>
+		@InjectRepository(Players)
+		private readonly playersRepository: Repository<Players>,
+		@InjectRepository(GameDetail)
+		private readonly gameRepository: Repository<GameDetail>,
 	) {}
 
 	async findAll(paginationQuery: PaginationQueryDto) {
@@ -26,8 +31,8 @@ export class PlayersService {
 			skip: offset,
 			take: returnMaxLimit,
 			order: {
-				updatedAt: 'DESC'
-			}
+				updatedAt: 'DESC',
+			},
 		});
 
 		return players;
@@ -35,8 +40,8 @@ export class PlayersService {
 
 	async findOne(playerGuid: string) {
 		const player = await this.playersRepository.findOne({
-			relations: [ 'gameDetails' ],
-			where: [ { playerGuid: playerGuid } ]
+			relations: ['gameDetails'],
+			where: [{ playerGuid: playerGuid }],
 		});
 		if (!player) {
 			throw new NotFoundException(`Player GUID: ${playerGuid} not found`);
@@ -44,8 +49,14 @@ export class PlayersService {
 		return player;
 	}
 
-	async findTop(topPlayersQuery: TopPlayersQueryDto) {
-		const { stat: hitsStat, gameType, minGames, minShots, limit } = topPlayersQuery;
+	async findTopAccuracy(topAccuracyQuery: TopAccuracyQueryDto) {
+		const {
+			stat: hitsStat,
+			gameType,
+			minGames,
+			minShots,
+			limit,
+		} = topAccuracyQuery;
 
 		const shotsStat = {
 			discDmgHitsTG: 'discShotsFiredTG',
@@ -54,16 +65,18 @@ export class PlayersService {
 			laserHitsTG: 'laserShotsFiredTG',
 			laserMATG: 'laserShotsFiredTG',
 			cgHitsTG: 'cgShotsFiredTG',
-			shockHitsTG: 'shockShotsFiredTG'
-		}[hitsStat]
+			shockHitsTG: 'shockShotsFiredTG',
+		}[hitsStat];
 
 		// Possibly make this a query param at some point?
 		const excludeDiscJumps = shotsStat === 'discShotsFiredTG';
 
 		const hitsValue = '(game.stats->:hitsStat->>0)::integer';
 		const shotsValue = '(game.stats->:shotsStat->>0)::integer';
-		const discJumpsValue = "COALESCE((game.stats->'discJumpTG'->>0)::integer, 0)";
-		const killerDiscJumpsValue = "COALESCE((game.stats->'killerDiscJumpTG'->>0)::integer, 0)";
+		const discJumpsValue =
+			"COALESCE((game.stats->'discJumpTG'->>0)::integer, 0)";
+		const killerDiscJumpsValue =
+			"COALESCE((game.stats->'killerDiscJumpTG'->>0)::integer, 0)";
 
 		// pgSQL doesn't let you reference aliased selections you've made in the
 		// same select statement, so unfortunately these computed JSON values are
@@ -73,15 +86,14 @@ export class PlayersService {
 		// parameterized instead.
 		const aggregatedHits = `SUM(${hitsValue})::integer`;
 		// Add sums of `discJumpTG` and `killerDiscJumpTG`.
-		const aggregatedDiscJumps =
-			`(SUM(${discJumpsValue})::integer + SUM(${killerDiscJumpsValue})::integer)`;
+		const aggregatedDiscJumps = `(SUM(${discJumpsValue})::integer + SUM(${killerDiscJumpsValue})::integer)`;
 
 		let aggregatedShots = `SUM(${shotsValue})::integer`;
 		if (excludeDiscJumps) {
 			// Since subtracting disc jumps could theoretically drop the shots count
 			// to 0, clamp it to at least the number of hits or 1, otherwise it'd be
 			// possible to divide by zero.
-			aggregatedShots = `GREATEST(1, ${aggregatedHits}, ${aggregatedShots} - ${aggregatedDiscJumps})`
+			aggregatedShots = `GREATEST(1, ${aggregatedHits}, ${aggregatedShots} - ${aggregatedDiscJumps})`;
 		}
 
 		// Cast to float to avoid integer division truncating the result.
@@ -90,7 +102,8 @@ export class PlayersService {
 		// TODO: This whole query could probably be turned into a `ViewEntity` at
 		// some point, but I couldn't get that to work.
 
-		let playersQuery = this.playersRepository.createQueryBuilder('player')
+		let playersQuery = this.playersRepository
+			.createQueryBuilder('player')
 			.setParameters({
 				hitsStat,
 				shotsStat,
@@ -103,29 +116,38 @@ export class PlayersService {
 				'stats.game_count',
 				'stats.hits',
 				'stats.shots',
-				'stats.accuracy'
+				'stats.accuracy',
 			])
-			.innerJoin(subQuery => {
-				let statsQuery = subQuery
-					.select(['game.player_guid'])
-					.from(GameDetail, 'game')
-					.addSelect('COUNT(game.id)::integer', 'game_count')
-					.addSelect(aggregatedHits, 'hits')
-					.addSelect(aggregatedShots, 'shots')
-					.addSelect(aggregatedAccuracy, 'accuracy')
-					.where(`${shotsValue} > 0`)
-					.groupBy('game.player_guid');
+			.innerJoin(
+				(subQuery) => {
+					let statsQuery = subQuery
+						.select(['game.player_guid'])
+						.from(GameDetail, 'game')
+						.addSelect('COUNT(game.id)::integer', 'game_count')
+						.addSelect(aggregatedHits, 'hits')
+						.addSelect(aggregatedShots, 'shots')
+						.addSelect(aggregatedAccuracy, 'accuracy')
+						.where(`${shotsValue} > 0`)
+						.groupBy('game.player_guid');
 
-				if (excludeDiscJumps) {
-					statsQuery = statsQuery.addSelect(aggregatedDiscJumps, 'disc_jumps');
-				}
+					if (excludeDiscJumps) {
+						statsQuery = statsQuery.addSelect(
+							aggregatedDiscJumps,
+							'disc_jumps',
+						);
+					}
 
-				if (gameType) {
-					statsQuery = statsQuery.andWhere('game.gametype = :gameType', { gameType })
-				}
+					if (gameType) {
+						statsQuery = statsQuery.andWhere('game.gametype = :gameType', {
+							gameType,
+						});
+					}
 
-				return statsQuery;
-			}, 'stats', 'stats.player_guid = player.player_guid')
+					return statsQuery;
+				},
+				'stats',
+				'stats.player_guid = player.player_guid',
+			)
 			.where('stats.game_count >= :minGames')
 			.andWhere('stats.shots >= :minShots')
 			.orderBy('stats.accuracy', 'DESC')
@@ -145,14 +167,14 @@ export class PlayersService {
 		const rows = await playersQuery.getRawMany();
 
 		// `getRawMany` was used, so manually snake_case -> camelCase.
-		const players = rows.map(row => ({
+		const players = rows.map((row) => ({
 			playerGuid: row.player_guid,
 			playerName: row.player_name,
 			gameCount: row.game_count,
 			hits: row.hits,
 			shots: row.shots,
 			discJumps: row.disc_jumps,
-			accuracy: row.accuracy
+			accuracy: row.accuracy,
 		}));
 
 		return {
@@ -165,7 +187,173 @@ export class PlayersService {
 			minGames,
 			minShots,
 			limit,
-			players
+			players,
+		};
+	}
+
+	async findTopWins(topWinsQuery: TopWinsQueryDto) {
+		const { minGames, limit } = topWinsQuery;
+		const gameType = 'CTFGame';
+
+		const query = this.playersRepository
+			.createQueryBuilder('player')
+			.setParameters({
+				gameType,
+				minGames,
+			})
+			.select(['stats.player_name', 'stats.player_guid'])
+			.addSelect('COUNT(stats.game_id)::integer', 'game_count')
+			.addSelect(
+				"COUNT(stats.player_match_result = 'win' OR NULL)::integer",
+				'win_count',
+			)
+			.addSelect(
+				"COUNT(stats.player_match_result = 'loss' OR NULL)::integer",
+				'loss_count',
+			)
+			.addSelect(
+				"COUNT(stats.player_match_result = 'draw' OR NULL)::integer",
+				'draw_count',
+			)
+			.addSelect(
+				"(COUNT(stats.player_match_result = 'win' OR NULL)::float + COUNT(stats.player_match_result = 'draw' OR NULL)::float / 2.0) / COUNT(stats.game_id)::float",
+				'win_percent',
+			)
+			.innerJoin(
+				(qb) => {
+					return (
+						qb
+							.select([
+								'game.player_name',
+								'game.player_guid',
+								'game.map',
+								'game.datestamp',
+								'join_g.*',
+							])
+							// Determine whether they spent at least 80% of the total match time on
+							// one team, and then determine whether that means they won or lost.
+							// Note that this team may be different from `dtTeamGame`.
+							.addSelect(
+								`CASE
+					WHEN
+						((game.stats->'timeOnTeamOneTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.8
+					THEN CASE
+						WHEN
+							join_g.score_storm > join_g.score_inferno
+						THEN 'win'
+						WHEN
+							join_g.score_storm < join_g.score_inferno
+						THEN 'loss'
+						WHEN
+							join_g.score_storm = join_g.score_inferno
+						THEN 'draw'
+						END
+					WHEN
+						((game.stats->'timeOnTeamTwoTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.8
+					THEN CASE
+						WHEN
+							join_g.score_inferno > join_g.score_storm
+						THEN 'win'
+						WHEN
+							join_g.score_inferno < join_g.score_storm
+						THEN 'loss'
+						WHEN
+							join_g.score_inferno = join_g.score_storm
+						THEN 'draw'
+						END
+					ELSE 'none'
+					END`.replace(/\s+/g, ' '),
+								'player_match_result',
+							)
+							.from(GameDetail, 'game')
+							.innerJoin(
+								(qb) => {
+									return (
+										qb
+											.select(['g.game_id'])
+											.addSelect(
+												"COUNT((g.stats->'dtTeamGame'->>0)::integer = 1 OR NULL)::integer",
+												'team_size_storm',
+											)
+											.addSelect(
+												"COUNT((g.stats->'dtTeamGame'->>0)::integer = 2 OR NULL)::integer",
+												'team_size_inferno',
+											)
+											// `teamScoreGame` can get screwed up: players on one team can be
+											// assigned the score from the other team (most likely due to team
+											// switching). So to determine each team's score, we take the
+											// average `teamScoreGame` of all players on that team. Due to the
+											// mentioned bug, it won't be 100% accurate, but should be good
+											// enough to determine which team won most of the time, which is all
+											// that matters for this stat.
+											.addSelect(
+												"AVG(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 1 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)::integer / 100",
+												'score_storm',
+											)
+											.addSelect(
+												"AVG(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 2 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)::integer / 100",
+												'score_inferno',
+											)
+											.from(GameDetail, 'g')
+											.groupBy('g.game_id')
+									);
+								},
+								'join_g',
+								'join_g.game_id = game.game_id',
+							)
+							.where('game.gametype = :gameType')
+							// Only count if the player's `gamePCT` was at least 80%. This is
+							// effectively how much of the match they were present for.
+							.andWhere("(game.stats->'gamePCT'->>0)::float >= 80")
+							// As an extra precaution against prematurely ended matches, only count
+							// games that lasted at least 10 minutes.
+							.andWhere("(game.stats->'matchRunTimeTG'->>0)::float >= 10")
+							// Each team must have at least 2 players.
+							.andWhere('join_g.team_size_storm >= 2')
+							.andWhere('join_g.team_size_inferno >= 2')
+					);
+				},
+				'stats',
+				'stats.player_guid = player.player_guid',
+			)
+			.where("stats.player_match_result != 'none'")
+			.having('COUNT(stats.game_id)::integer >= :minGames')
+			.groupBy('stats.player_guid')
+			.addGroupBy('stats.player_name')
+			.orderBy(
+				"(COUNT(stats.player_match_result = 'win' OR NULL)::float + COUNT(stats.player_match_result = 'draw' OR NULL)::float / 2.0) / COUNT(stats.game_id)::float",
+				'DESC',
+			)
+			.limit(limit);
+
+		// Uncomment to debug:
+		// console.log(query.getQueryAndParameters());
+
+		// typeorm doesn't let you select computed columns since they're not part
+		// of the entity definition. There are workarounds, but I'm not a fan of any
+		// and would rather use `getRawMany()` for now, which does include them.
+		// See: https://github.com/typeorm/typeorm/issues/296
+		const rows = await query.getRawMany();
+
+		// `getRawMany` was used, so manually snake_case -> camelCase.
+		const players = rows.map((row) => ({
+			playerGuid: row.player_guid,
+			playerName: row.player_name,
+			gameCount: row.game_count,
+			winCount: row.win_count,
+			lossCount: row.loss_count,
+			drawCount: row.draw_count,
+			winPercent: row.win_percent,
+		}));
+
+		return {
+			// Even though some of these parameters might have been supplied as input,
+			// it's still useful to know what values were actually used, in case
+			// defaults were used instead, values were clamped to min/max, etc.
+			minGames,
+			gameType,
+			limit,
+			players,
 		};
 	}
 }
