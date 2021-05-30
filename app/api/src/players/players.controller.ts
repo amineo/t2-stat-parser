@@ -3,7 +3,10 @@ import { ApiOperation } from '@nestjs/swagger';
 
 import { PlayersService } from './players.service';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
-import { TopPlayersQueryDto } from '../common/dto/top-players-query.dto';
+import {
+	TopAccuracyQueryDto,
+	TopWinsQueryDto,
+} from '../common/dto/top-players-query.dto';
 
 @Controller('players')
 export class PlayersController {
@@ -11,7 +14,7 @@ export class PlayersController {
 
 	// /players
 	@Get()
-	@ApiOperation({ tags: [ 'Player' ], summary: 'Return a list of players' })
+	@ApiOperation({ tags: ['Player'], summary: 'Return a list of players' })
 	findAll(@Query() paginationQuery: PaginationQueryDto) {
 		const { limit = 10, offset = 0 } = paginationQuery;
 		return this.playerService.findAll({ limit, offset });
@@ -19,23 +22,36 @@ export class PlayersController {
 
 	@Get('top/accuracy')
 	@ApiOperation({
-		tags: [ 'Player', 'Leaderboard' ],
-		summary: 'Return a leaderboard of players for a specific accuracy stat'
+		tags: ['Player', 'Leaderboard'],
+		summary: 'Return a leaderboard of players for a specific accuracy stat',
 	})
-	findTop(@Query() topPlayersQuery: TopPlayersQueryDto) {
+	findTopAccuracy(@Query() topPlayersQuery: TopAccuracyQueryDto) {
 		const {
 			stat,
 			gameType,
 			minGames = 10,
 			minShots = 100,
-			limit = 10
+			limit = 10,
 		} = topPlayersQuery;
-		return this.playerService.findTop({
+		return this.playerService.findTopAccuracy({
 			stat,
 			gameType,
 			minGames,
 			minShots,
-			limit
+			limit,
+		});
+	}
+
+	@Get('top/wins')
+	@ApiOperation({
+		tags: ['Player', 'Leaderboard'],
+		summary: 'Return a leaderboard of players for win percentage',
+	})
+	findTopWins(@Query() topPlayersQuery: TopWinsQueryDto) {
+		const { minGames = 100, limit = 10 } = topPlayersQuery;
+		return this.playerService.findTopWins({
+			minGames,
+			limit,
 		});
 	}
 }
