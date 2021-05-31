@@ -287,11 +287,11 @@ export class PlayersService {
 											// enough to determine which team won most of the time, which is all
 											// that matters for this stat.
 											.addSelect(
-												"AVG(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 1 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)::integer / 100",
+												"(mode() WITHIN GROUP (ORDER BY CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 1 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
 												'score_storm',
 											)
 											.addSelect(
-												"AVG(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 2 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)::integer / 100",
+												"(mode() WITHIN GROUP (ORDER BY CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 2 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
 												'score_inferno',
 											)
 											.from(GameDetail, 'g')
