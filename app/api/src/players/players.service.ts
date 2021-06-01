@@ -193,14 +193,10 @@ export class PlayersService {
 
 	async findTopWins(topWinsQuery: TopWinsQueryDto) {
 		const { minGames, limit } = topWinsQuery;
-		const gameType = 'CTFGame';
 
 		const query = this.playersRepository
 			.createQueryBuilder('player')
-			.setParameters({
-				gameType,
-				minGames,
-			})
+			.setParameters({ minGames })
 			.select(['stats.player_name', 'stats.player_guid'])
 			.addSelect('COUNT(stats.game_id)::integer', 'game_count')
 			.addSelect(
@@ -230,13 +226,13 @@ export class PlayersService {
 								'game.datestamp',
 								'join_g.*',
 							])
-							// Determine whether they spent at least 80% of the total match time on
+							// Determine whether they spent at least 67% of the total match time on
 							// one team, and then determine whether that means they won or lost.
 							// Note that this team may be different from `dtTeamGame`.
 							.addSelect(
 								`CASE
 					WHEN
-						((game.stats->'timeOnTeamOneTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.8
+						((game.stats->'timeOnTeamOneTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.67
 					THEN CASE
 						WHEN
 							join_g.score_storm > join_g.score_inferno
@@ -249,7 +245,7 @@ export class PlayersService {
 						THEN 'draw'
 						END
 					WHEN
-						((game.stats->'timeOnTeamTwoTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.8
+						((game.stats->'timeOnTeamTwoTG'->>0)::float / (game.stats->'matchRunTimeTG'->>0)::float) >= 0.67
 					THEN CASE
 						WHEN
 							join_g.score_inferno > join_g.score_storm
@@ -272,26 +268,25 @@ export class PlayersService {
 										qb
 											.select(['g.game_id'])
 											.addSelect(
-												"COUNT((g.stats->'dtTeamGame'->>0)::integer = 1 OR NULL)::integer",
+												"COUNT(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 1 AND (g.stats->'timeOnTeamOneTG'->>0)::float > 0 THEN 1 ELSE NULL END)::integer",
 												'team_size_storm',
 											)
 											.addSelect(
-												"COUNT((g.stats->'dtTeamGame'->>0)::integer = 2 OR NULL)::integer",
+												"COUNT(CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 2 AND (g.stats->'timeOnTeamTwoTG'->>0)::float > 0 THEN 1 ELSE NULL END)::integer",
 												'team_size_inferno',
 											)
-											// `teamScoreGame` can get screwed up: players on one team can be
-											// assigned the score from the other team (most likely due to team
-											// switching). So to determine each team's score, we take the
-											// average `teamScoreGame` of all players on that team. Due to the
-											// mentioned bug, it won't be 100% accurate, but should be good
-											// enough to determine which team won most of the time, which is all
-											// that matters for this stat.
+											// `teamScoreGame` can get screwed up: players on one team
+											// can be assigned the score from the other team (most
+											// likely due to team switching). So to determine each
+											// team's score, we take the most common `teamScoreGame`
+											// from all players on that team who don't have a `timeOnTeam`
+											// value of 0.
 											.addSelect(
-												"(mode() WITHIN GROUP (ORDER BY CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 1 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
+												"(mode() WITHIN GROUP (ORDER BY CASE WHEN ((g.stats->'dtTeamGame'->>0)::integer = 1 AND (g.stats->'timeOnTeamOneTG'->>0)::float > 0) THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
 												'score_storm',
 											)
 											.addSelect(
-												"(mode() WITHIN GROUP (ORDER BY CASE WHEN (g.stats->'dtTeamGame'->>0)::integer = 2 THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
+												"(mode() WITHIN GROUP (ORDER BY CASE WHEN ((g.stats->'dtTeamGame'->>0)::integer = 2 AND (g.stats->'timeOnTeamTwoTG'->>0)::float > 0) THEN (g.stats->'teamScoreGame'->>0)::integer ELSE NULL END)) / 100",
 												'score_inferno',
 											)
 											.from(GameDetail, 'g')
@@ -301,10 +296,10 @@ export class PlayersService {
 								'join_g',
 								'join_g.game_id = game.game_id',
 							)
-							.where('game.gametype = :gameType')
-							// Only count if the player's `gamePCT` was at least 80%. This is
+							.where("(game.gametype = 'CTFGame' OR game.gametype = 'SCtFGame')")
+							// Only count if the player's `gamePCT` was at least 67%. This is
 							// effectively how much of the match they were present for.
-							.andWhere("(game.stats->'gamePCT'->>0)::float >= 80")
+							.andWhere("(game.stats->'gamePCT'->>0)::float >= 67")
 							// As an extra precaution against prematurely ended matches, only count
 							// games that lasted at least 10 minutes.
 							.andWhere("(game.stats->'matchRunTimeTG'->>0)::float >= 10")
@@ -351,7 +346,7 @@ export class PlayersService {
 			// it's still useful to know what values were actually used, in case
 			// defaults were used instead, values were clamped to min/max, etc.
 			minGames,
-			gameType,
+			gameType: ['CTFGame', 'SCtFGame'],
 			limit,
 			players,
 		};
