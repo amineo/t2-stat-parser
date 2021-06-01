@@ -1,5 +1,9 @@
 /* eslint-disable */
 
+function formatArrayOfNumbers(arr: string): number[] {
+	return arr ? arr.split(',').map(Number) : [];
+};
+
 // Fixup player stat line types
 function formatPlayerStats(statObj: any) {
 	return {
@@ -202,8 +206,8 @@ function formatPlayerStats(statObj: any) {
 		gamePCT: Number(statObj.stats.gamePCT),
 		startPCTGame: Number(statObj.stats.startPCTGame),
 		endPCTGame: Number(statObj.stats.endPCTGame),
-		teamOneCapTimesGame: statObj.stats.teamOneCapTimesGame.split(',').map(Number),
-		teamTwoCapTimesGame: statObj.stats.teamTwoCapTimesGame.split(',').map(Number),
+		teamOneCapTimesGame: formatArrayOfNumbers(statObj.stats.teamOneCapTimesGame),
+		teamTwoCapTimesGame: formatArrayOfNumbers(statObj.stats.teamTwoCapTimesGame),
 		mapSkipGame: Number(statObj.stats.mapSkipGame),
 		clientQuitGame: Number(statObj.stats.clientQuitGame),
 		genDefendsTG: Number(statObj.stats.genDefendsTG),
