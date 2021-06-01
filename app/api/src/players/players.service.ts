@@ -193,14 +193,10 @@ export class PlayersService {
 
 	async findTopWins(topWinsQuery: TopWinsQueryDto) {
 		const { minGames, limit } = topWinsQuery;
-		const gameType = 'CTFGame';
 
 		const query = this.playersRepository
 			.createQueryBuilder('player')
-			.setParameters({
-				gameType,
-				minGames,
-			})
+			.setParameters({ minGames })
 			.select(['stats.player_name', 'stats.player_guid'])
 			.addSelect('COUNT(stats.game_id)::integer', 'game_count')
 			.addSelect(
@@ -300,7 +296,7 @@ export class PlayersService {
 								'join_g',
 								'join_g.game_id = game.game_id',
 							)
-							.where('game.gametype = :gameType')
+							.where("(game.gametype = 'CTFGame' OR game.gametype = 'SCtFGame')")
 							// Only count if the player's `gamePCT` was at least 67%. This is
 							// effectively how much of the match they were present for.
 							.andWhere("(game.stats->'gamePCT'->>0)::float >= 67")
@@ -350,7 +346,7 @@ export class PlayersService {
 			// it's still useful to know what values were actually used, in case
 			// defaults were used instead, values were clamped to min/max, etc.
 			minGames,
-			gameType,
+			gameType: ['CTFGame', 'SCtFGame'],
 			limit,
 			players,
 		};
