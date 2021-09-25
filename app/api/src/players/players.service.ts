@@ -66,6 +66,9 @@ export class PlayersService {
 			laserMATG: 'laserShotsFiredTG',
 			cgHitsTG: 'cgShotsFiredTG',
 			shockHitsTG: 'shockShotsFiredTG',
+			grenadeDmgHitsTG: 'grenadeShotsFiredTG',
+			grenadeHitsTG: 'grenadeShotsFiredTG',
+			grenadeMATG: 'grenadeShotsFiredTG',
 		}[hitsStat];
 
 		// Possibly make this a query param at some point?
