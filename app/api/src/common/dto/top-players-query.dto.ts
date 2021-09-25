@@ -12,6 +12,9 @@ const hitStats = [
 	'laserMATG',
 	'cgHitsTG',
 	'shockHitsTG',
+	'grenadeHitsTG',
+	'grenadeDmgHitsTG',
+	'grenadeMATG',
 ] as const;
 
 type Stat = typeof hitStats[number];
