@@ -56,7 +56,7 @@ export class PlayersService {
 			minGames,
 			minShots,
 			limit,
-			timePeriod,
+			timePeriod = null,
 		} = topAccuracyQuery;
 
 		const shotsStat = {
@@ -206,7 +206,7 @@ export class PlayersService {
 	}
 
 	async findTopWins(topWinsQuery: TopWinsQueryDto) {
-		const { minGames, limit, timePeriod } = topWinsQuery;
+		const { minGames, limit, timePeriod = null } = topWinsQuery;
 
 		const sinceDate = '(now() - (:timePeriod)::interval)';
 
