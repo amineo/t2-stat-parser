@@ -32,6 +32,7 @@ export class PlayersController {
 			minGames = 10,
 			minShots = 100,
 			limit = 10,
+			timePeriod,
 		} = topPlayersQuery;
 		return this.playerService.findTopAccuracy({
 			stat,
@@ -39,6 +40,7 @@ export class PlayersController {
 			minGames,
 			minShots,
 			limit,
+			timePeriod,
 		});
 	}
 
@@ -48,10 +50,11 @@ export class PlayersController {
 		summary: 'Return a leaderboard of players for win percentage',
 	})
 	findTopWins(@Query() topPlayersQuery: TopWinsQueryDto) {
-		const { minGames = 100, limit = 10 } = topPlayersQuery;
+		const { minGames = 100, limit = 10, timePeriod } = topPlayersQuery;
 		return this.playerService.findTopWins({
 			minGames,
 			limit,
+			timePeriod,
 		});
 	}
 }

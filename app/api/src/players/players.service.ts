@@ -56,6 +56,7 @@ export class PlayersService {
 			minGames,
 			minShots,
 			limit,
+			timePeriod = null,
 		} = topAccuracyQuery;
 
 		const shotsStat = {
@@ -102,6 +103,8 @@ export class PlayersService {
 		// Cast to float to avoid integer division truncating the result.
 		const aggregatedAccuracy = `(${aggregatedHits}::float / ${aggregatedShots}::float)`;
 
+		const sinceDate = '(now() - (:timePeriod)::interval)';
+
 		// TODO: This whole query could probably be turned into a `ViewEntity` at
 		// some point, but I couldn't get that to work.
 
@@ -112,6 +115,7 @@ export class PlayersService {
 				shotsStat,
 				minGames,
 				minShots,
+				timePeriod,
 			})
 			.select([
 				'player.player_guid',
@@ -121,6 +125,10 @@ export class PlayersService {
 				'stats.shots',
 				'stats.accuracy',
 			])
+			.addSelect(
+				timePeriod ? sinceDate : 'NULL',
+				'since_date'
+			)
 			.innerJoin(
 				(subQuery) => {
 					let statsQuery = subQuery
@@ -131,6 +139,7 @@ export class PlayersService {
 						.addSelect(aggregatedShots, 'shots')
 						.addSelect(aggregatedAccuracy, 'accuracy')
 						.where(`${shotsValue} > 0`)
+						.andWhere(timePeriod ? `game.datestamp >= ${sinceDate}` : 'TRUE')
 						.groupBy('game.player_guid');
 
 					if (excludeDiscJumps) {
@@ -190,16 +199,20 @@ export class PlayersService {
 			minGames,
 			minShots,
 			limit,
+			timePeriod,
+			sinceDate: rows.length ? rows[0].since_date : null,
 			players,
 		};
 	}
 
 	async findTopWins(topWinsQuery: TopWinsQueryDto) {
-		const { minGames, limit } = topWinsQuery;
+		const { minGames, limit, timePeriod = null } = topWinsQuery;
+
+		const sinceDate = '(now() - (:timePeriod)::interval)';
 
 		const query = this.playersRepository
 			.createQueryBuilder('player')
-			.setParameters({ minGames })
+			.setParameters({ minGames, timePeriod })
 			.select(['stats.player_name', 'stats.player_guid'])
 			.addSelect('COUNT(stats.game_id)::integer', 'game_count')
 			.addSelect(
@@ -217,6 +230,10 @@ export class PlayersService {
 			.addSelect(
 				"(COUNT(stats.player_match_result = 'win' OR NULL)::float + COUNT(stats.player_match_result = 'draw' OR NULL)::float / 2.0) / COUNT(stats.game_id)::float",
 				'win_percent',
+			)
+			.addSelect(
+				timePeriod ? sinceDate : 'NULL',
+				'since_date'
 			)
 			.innerJoin(
 				(qb) => {
@@ -309,6 +326,8 @@ export class PlayersService {
 							// Each team must have at least 2 players.
 							.andWhere('join_g.team_size_storm >= 2')
 							.andWhere('join_g.team_size_inferno >= 2')
+							// Must fall within the specified time period.
+							.andWhere(timePeriod ? `game.datestamp >= ${sinceDate}` : 'TRUE')
 					);
 				},
 				'stats',
@@ -351,6 +370,8 @@ export class PlayersService {
 			minGames,
 			gameType: ['CTFGame', 'SCtFGame'],
 			limit,
+			timePeriod,
+			sinceDate: rows.length ? rows[0].since_date : null,
 			players,
 		};
 	}

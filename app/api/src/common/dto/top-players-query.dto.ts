@@ -40,6 +40,9 @@ export class TopAccuracyQueryDto {
 	@IsPositive()
 	@Max(100)
 	limit: number;
+
+	@IsOptional()
+	timePeriod: string;
 }
 
 export class TopWinsQueryDto {
@@ -51,4 +54,7 @@ export class TopWinsQueryDto {
 	@IsPositive()
 	@Max(100)
 	limit: number;
+
+	@IsOptional()
+	timePeriod: string;
 }
