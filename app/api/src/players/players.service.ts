@@ -103,7 +103,7 @@ export class PlayersService {
 		// Cast to float to avoid integer division truncating the result.
 		const aggregatedAccuracy = `(${aggregatedHits}::float / ${aggregatedShots}::float)`;
 
-		const sinceDate = '(now() - interval :timePeriod)';
+		const sinceDate = '(now() - (:timePeriod)::interval)';
 
 		// TODO: This whole query could probably be turned into a `ViewEntity` at
 		// some point, but I couldn't get that to work.
@@ -208,7 +208,7 @@ export class PlayersService {
 	async findTopWins(topWinsQuery: TopWinsQueryDto) {
 		const { minGames, limit, timePeriod } = topWinsQuery;
 
-		const sinceDate = '(now() - interval :timePeriod)';
+		const sinceDate = '(now() - (:timePeriod)::interval)';
 
 		const query = this.playersRepository
 			.createQueryBuilder('player')
