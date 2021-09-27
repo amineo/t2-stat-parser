@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -9,7 +9,11 @@ import { Players } from './entities/Players';
 import { GameDetail } from '../game/entities/GameDetail';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Players, GameDetail]), ConfigModule],
+	imports: [
+		CacheModule.register(),
+		TypeOrmModule.forFeature([Players, GameDetail]),
+		ConfigModule
+	],
 	providers: [PlayersService],
 	controllers: [PlayersController],
 })

@@ -1,4 +1,5 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, Inject, CACHE_MANAGER } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { PlayersService } from './players.service';
@@ -7,10 +8,14 @@ import {
 	TopAccuracyQueryDto,
 	TopWinsQueryDto,
 } from '../common/dto/top-players-query.dto';
+import { cache } from 'joi';
 
 @Controller('players')
 export class PlayersController {
-	constructor(private readonly playerService: PlayersService) {}
+	constructor(
+		private readonly playerService: PlayersService,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache
+	) {}
 
 	// /players
 	@Get()
@@ -25,7 +30,7 @@ export class PlayersController {
 		tags: ['Player', 'Leaderboard'],
 		summary: 'Return a leaderboard of players for a specific accuracy stat',
 	})
-	findTopAccuracy(@Query() topPlayersQuery: TopAccuracyQueryDto) {
+	async findTopAccuracy(@Query() topPlayersQuery: TopAccuracyQueryDto) {
 		const {
 			stat,
 			gameType,
@@ -34,27 +39,54 @@ export class PlayersController {
 			limit = 10,
 			timePeriod,
 		} = topPlayersQuery;
-		return this.playerService.findTopAccuracy({
-			stat,
-			gameType,
-			minGames,
-			minShots,
-			limit,
-			timePeriod,
-		});
+
+		const cacheKey =`topacc_${stat}_${gameType}_${minGames}_${minShots}_${limit}_${timePeriod}`;
+		const queryCache = await this.cacheManager.get(cacheKey);
+
+		if(!queryCache){
+			const results = await this.playerService.findTopAccuracy({
+				stat,
+				gameType,
+				minGames,
+				minShots,
+				limit,
+				timePeriod,
+			});
+			
+			await this.cacheManager.set(cacheKey, results, { ttl: 3600 * 2 }); // 2 hours
+			return results
+		}
+		
+		return queryCache
 	}
+
 
 	@Get('top/wins')
 	@ApiOperation({
 		tags: ['Player', 'Leaderboard'],
 		summary: 'Return a leaderboard of players for win percentage',
 	})
-	findTopWins(@Query() topPlayersQuery: TopWinsQueryDto) {
+	async findTopWins(@Query() topPlayersQuery: TopWinsQueryDto) {
 		const { minGames = 100, limit = 10, timePeriod } = topPlayersQuery;
-		return this.playerService.findTopWins({
-			minGames,
-			limit,
-			timePeriod,
-		});
+
+		const cacheKey =`topwins_${minGames}_${limit}_${timePeriod}`;
+		const queryCache = await this.cacheManager.get(cacheKey);
+
+		/*
+			If we don't have a cache ready, lets make one so the next hit is super fast
+			Cache ttl is in seconds
+		*/
+		if(!queryCache){
+			const results = await this.playerService.findTopWins({
+				minGames,
+				limit,
+				timePeriod,
+			});
+
+			await this.cacheManager.set(cacheKey, results, { ttl: 3600 * 2 }); // 2 hours
+			return results
+		}
+
+		return queryCache
 	}
 }
