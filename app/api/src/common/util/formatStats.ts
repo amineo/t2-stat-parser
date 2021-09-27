@@ -1,7 +1,11 @@
 /* eslint-disable */
 
-function formatArrayOfNumbers(arr: string): number[] {
-	return arr ? arr.split(',').map(Number) : [];
+// function formatArrayOfNumbers(arr: string): number[] {
+// 	return arr ? arr.split(',').map(Number) : [];
+// };
+
+function formatArrayOfNumbers(arr){
+	return arr;
 };
 
 // Fixup player stat line types

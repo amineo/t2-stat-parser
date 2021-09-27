@@ -159,7 +159,7 @@ export class GameService {
       inferno: { score: 0, playerCount: 0 },
     };
 
-    console.log(query);
+   // console.log(query);
 
     for (const player of query) {
       const flagGrabsTG = parseInt(player.stats.flagGrabsTG[0]);
