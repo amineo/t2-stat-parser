@@ -24,7 +24,7 @@ export class GamesService {
 			skip: offset,
 			take: returnMaxLimit,
 			order: {
-				gameId: 'DESC'
+				datestamp: 'DESC'
 			}
 		});
 
@@ -47,7 +47,7 @@ export class GamesService {
 			skip: offset,
 			take: returnMaxLimit,
 			order: {
-				gameId: 'DESC'
+				datestamp: 'DESC'
 			}
 		});
 
@@ -69,7 +69,7 @@ export class GamesService {
 			skip: offset,
 			take: returnMaxLimit,
 			order: {
-				gameId: 'DESC'
+				datestamp: 'DESC'
 			}
 		});
 		if (!games.length) {
@@ -96,7 +96,7 @@ export class GamesService {
 			skip: offset,
 			take: returnMaxLimit,
 			order: {
-				gameId: 'DESC'
+				datestamp: 'DESC'
 			}
 		});
 		if (!games.length) {
