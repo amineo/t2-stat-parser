@@ -11,3 +11,5 @@ app/t2-stat-parser/serverStats/__notes
 docker-compose.deploy.yml
 traefik.yml
 docker-secrets/adonis.appkey.*
+
+*.dump
