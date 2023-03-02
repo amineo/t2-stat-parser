@@ -3,7 +3,7 @@ FROM node:12.18-alpine as builder
 
 WORKDIR /build/app
 
-RUN npm i -g @nestjs/cli
+RUN npm i -g @nestjs/cli@7.4.1
 
 COPY ./app/api .
 RUN npm install 
@@ -18,7 +18,7 @@ RUN nest build
 
 # [ Stage 2 ] 
 FROM node:12.18-alpine
-LABEL maintainer="Season 4 <webmaster@season4.io>"
+LABEL maintainer="Anthony Mineo <anthonymineo@gmail.com>"
 
 RUN apk update && apk add --no-cache openssl bash curl
 
@@ -33,7 +33,7 @@ ENV APP_URL=https://${HOST}:${PORT}
 
 # Setup pm2 as our node process manager
 # https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/
-RUN npm i -g pm2 @nestjs/cli
+RUN npm i -g pm2 @nestjs/cli@7.4.1
 
 RUN mkdir /opt/node_app && chown node:node /opt/node_app && mkdir /localcert && chown node:node /localcert
 RUN mkdir -p /opt/node_app/app/node_modules/ && chown node:node /opt/node_app/app/node_modules/
